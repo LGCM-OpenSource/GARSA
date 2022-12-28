@@ -1,0 +1,19 @@
+PLINK v2.00a3.3LM 64-bit Intel (3 Jun 2022)    www.cog-genomics.org/plink/2.0/
+(C) 2005-2022 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/temp_bim_to_annot.log.
+Options in effect:
+  --allow-extra-chr
+  --id-delim _
+  --make-just-bim
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/temp_bim_to_annot
+  --vcf modules/teste/GARSA_example.unique.vcf.gz
+
+Start time: Wed Dec 28 09:20:03 2022
+64228 MiB RAM detected; reserving 32114 MiB for main workspace.
+Using up to 16 threads (change this with --threads).
+1054284 variants loaded from modules/teste/GARSA_example.unique.vcf.gz.
+Note: No phenotype data present.
+Writing
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/temp_bim_to_annot.bim
+... done.
+End time: Wed Dec 28 09:20:03 2022

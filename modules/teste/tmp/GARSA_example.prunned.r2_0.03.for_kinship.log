@@ -1,0 +1,30 @@
+PLINK v1.90b6.16 64-bit (17 Feb 2020)
+Options in effect:
+  --allow-extra-chr
+  --bfile /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_tmp
+  --extract /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_tmp.prune.in
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.prunned.r2_0.03.for_kinship
+  --recode vcf
+
+Hostname: fernando-Vostro
+Working directory: /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final
+Start time: Wed Dec 28 09:50:51 2022
+
+Random number seed: 1672231851
+64228 MB RAM detected; reserving 32114 MB for main workspace.
+1052320 variants loaded from .bim file.
+100 people (0 males, 0 females, 100 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.prunned.r2_0.03.for_kinship.nosex
+.
+--extract: 4830 variants remaining.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 100 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+4830 variants and 100 people pass filters and QC.
+Note: No phenotypes present.
+--recode vcf to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.prunned.r2_0.03.for_kinship.vcf
+... done.
+
+End time: Wed Dec 28 09:50:52 2022

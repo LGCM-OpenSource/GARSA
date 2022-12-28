@@ -1,0 +1,31 @@
+PLINK v1.90b6.16 64-bit (17 Feb 2020)
+Options in effect:
+  --allow-extra-chr
+  --bfile /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_swapped
+  --flip /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/flip_allele.txt
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_flipped
+  --recode vcf bgz
+  --threads 4
+
+Hostname: fernando-Vostro
+Working directory: /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final
+Start time: Wed Dec 28 09:20:32 2022
+
+Random number seed: 1672230032
+64228 MB RAM detected; reserving 32114 MB for main workspace.
+1054284 variants loaded from .bim file.
+100 people (0 males, 0 females, 100 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_flipped.nosex
+.
+--flip: 208 SNPs flipped.
+Using up to 4 threads (change this with --threads).
+Before main variant filters, 100 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+1054284 variants and 100 people pass filters and QC.
+Note: No phenotypes present.
+--recode vcf bgz to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_flipped.vcf.gz
+... done.
+
+End time: Wed Dec 28 09:20:35 2022

@@ -1,0 +1,42 @@
+PLINK v2.00a3.3LM 64-bit Intel (3 Jun 2022)
+Options in effect:
+  --allow-extra-chr
+  --export vcf bgz
+  --geno 0.05
+  --keep-allele-order
+  --maf 0.01
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC
+  --threads 4
+  --vcf modules/teste/GARSA_example.unique.RSIDs.vcf.gz
+
+Hostname: fernando-Vostro
+Working directory: /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final
+Start time: Wed Dec 28 09:27:44 2022
+
+Note: --keep-allele-order no longer has any effect.
+Random number seed: 1672230464
+64228 MiB RAM detected; reserving 32114 MiB for main workspace.
+Using up to 4 compute threads.
+--vcf: 1054284 variants scanned.
+--vcf:
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC-temporary.pgen
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC-temporary.pvar.zst
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC-temporary.psam
+written.
+100 samples (0 females, 0 males, 100 ambiguous; 100 founders) loaded from
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC-temporary.psam.
+1054284 variants loaded from
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC-temporary.pvar.zst.
+Note: No phenotype data present.
+Calculating allele frequencies... done.
+--geno: 0 variants removed due to missing genotype data.
+1964 variants removed due to allele frequency threshold(s)
+(--maf/--max-maf/--mac/--max-mac).
+1052320 variants remaining after main filters.
+--export vcf bgz to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC.vcf.gz
+... done.
+
+End time: Wed Dec 28 09:27:45 2022

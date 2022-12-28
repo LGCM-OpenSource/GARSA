@@ -1,0 +1,43 @@
+PLINK v1.90b6.16 64-bit (17 Feb 2020)
+Options in effect:
+  --allow-extra-chr
+  --id-delim _
+  --make-bed
+  --mind 0.1
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND
+  --threads 4
+  --vcf modules/teste/GARSA_example.unique.RSIDs.R2andQC.vcf.gz
+
+Hostname: fernando-Vostro
+Working directory: /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final
+Start time: Wed Dec 28 09:30:36 2022
+
+Random number seed: 1672230636
+64228 MB RAM detected; reserving 32114 MB for main workspace.
+--vcf:
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND-temporary.bed
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND-temporary.bim
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND-temporary.fam
+written.
+1052320 variants loaded from .bim file.
+100 people (0 males, 0 females, 100 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND.nosex
+.
+0 people removed due to missing genotype data (--mind).
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 100 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+1052320 variants and 100 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND.bed
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND.bim
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND.fam
+... done.
+
+End time: Wed Dec 28 09:30:38 2022

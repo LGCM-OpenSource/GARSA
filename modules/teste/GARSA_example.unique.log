@@ -1,0 +1,35 @@
+PLINK v2.00a3.3LM 64-bit Intel (3 Jun 2022)
+Options in effect:
+  --allow-extra-chr
+  --export vcf bgz
+  --max-alleles 2
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique
+  --threads 4
+  --vcf modules/teste/GARSA_example.vcf.gz
+
+Hostname: fernando-Vostro
+Working directory: /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final
+Start time: Wed Dec 28 08:48:10 2022
+
+Random number seed: 1672228090
+64228 MiB RAM detected; reserving 32114 MiB for main workspace.
+Using up to 4 compute threads.
+--vcf: 1054284 variants scanned.
+--vcf:
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique-temporary.pgen
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique-temporary.pvar.zst
++
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique-temporary.psam
+written.
+100 samples (0 females, 0 males, 100 ambiguous; 100 founders) loaded from
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique-temporary.psam.
+1054284 variants loaded from
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique-temporary.pvar.zst.
+Note: No phenotype data present.
+1054284 variants remaining after main filters.
+--export vcf bgz to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.vcf.gz
+... done.
+
+End time: Wed Dec 28 08:48:11 2022

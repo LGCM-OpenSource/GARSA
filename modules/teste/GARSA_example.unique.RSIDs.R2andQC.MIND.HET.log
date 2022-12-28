@@ -1,0 +1,31 @@
+PLINK v1.90b6.16 64-bit (17 Feb 2020)
+Options in effect:
+  --allow-extra-chr
+  --bfile /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example.MIND
+  --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC.MIND.HET
+  --recode vcf bgz
+  --remove /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/tmp/GARSA_example_fail-het.txt
+  --threads 4
+
+Hostname: fernando-Vostro
+Working directory: /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final
+Start time: Wed Dec 28 09:30:38 2022
+
+Random number seed: 1672230638
+64228 MB RAM detected; reserving 32114 MB for main workspace.
+1052320 variants loaded from .bim file.
+100 people (0 males, 0 females, 100 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC.MIND.HET.nosex
+.
+--remove: 100 people remaining.
+Using up to 4 threads (change this with --threads).
+Before main variant filters, 100 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+1052320 variants and 100 people pass filters and QC.
+Note: No phenotypes present.
+--recode vcf bgz to
+/home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/Final/modules/teste/GARSA_example.unique.RSIDs.R2andQC.MIND.HET.vcf.gz
+... done.
+
+End time: Wed Dec 28 09:30:41 2022
