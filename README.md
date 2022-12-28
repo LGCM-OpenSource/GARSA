@@ -95,7 +95,7 @@ optional arguments:
 `python3 GARSA.py desdup`
 
 ```
-usage: dedup_SNPs.py [-h] -vcf VCF_FILE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] -plink2 PLINK2_PATH [--threads THREADS]
+usage: deduplication.py [-h] -vcf VCF_FILE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] -plink2 PLINK2_PATH [--threads THREADS]
 
 This is a script to identify and remove duplicated SNPs
 
@@ -125,7 +125,7 @@ Usage:
 `python3 GARSA.py update_rsID` 
 
 ```
-usage: update_rsID_teste_MOD1.py [-h] -vcf VCF_FILE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] [-rm_tmp] [--threads THREADS]
+usage: update_rsID.py [-h] -vcf VCF_FILE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] [-rm_tmp] [--threads THREADS]
 
 This is a script to update SNP rsIDs (for hg19). This script assumes that your file have the pattern chr[1-22]_any_name.extensions
 
@@ -192,7 +192,7 @@ This module executes variant quality controls
 `python3 GARSA.py quality_control` 
 
 ```
-usage: imput_QC_0.1.py [-h] -vcf VCF_FILE [-bcftools BCFTOOLS_PATH] [-plink2 PLINK2_PATH] [-o OUTPUT_FOLDER] [-geno GENO_PLINK] [-maf MAF_PLINK] [-HWE HARDY] [-use_HWE USE_HARDY] [-R2 R_SQUARED]
+usage: SNP_QC.py [-h] -vcf VCF_FILE [-bcftools BCFTOOLS_PATH] [-plink2 PLINK2_PATH] [-o OUTPUT_FOLDER] [-geno GENO_PLINK] [-maf MAF_PLINK] [-HWE HARDY] [-use_HWE USE_HARDY] [-R2 R_SQUARED]
                        [-INFO INFO_SCORE] [--score_type SCORE_TYPE] [--threads THREADS]
 
 This is a script runs standard QC process for imputed datasets
@@ -251,7 +251,7 @@ This module executes quality control on samples, including heterozigosity rates
 `python3 GARSA.py quality_ind`
 
 ```
-usage: QC_for_indiv_0.1.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-mind MIND_PLINK] [--threads THREADS] [-o OUTPUT_FOLDER]
+usage: sample_QC.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-mind MIND_PLINK] [--threads THREADS] [-o OUTPUT_FOLDER]
 
 This is a script runs standard QC process for imputed datasets
 
@@ -280,7 +280,7 @@ This is an important module, aiming the kinship analysis with corrections for ad
 `python3  GARSA.py kinship` 
 
 ```
-usage: Kinship_and_correction_0.1.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
+usage: Kinship_and_correction.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
                                      [--degree DEGREE] [--threads THREADS]
 
 This is a script to run kinship analysis corrected by values from population stratification
@@ -322,7 +322,7 @@ This module runs the PCA analysis in 4 main steps.
 `python3 GARSA.py PCA`
 
 ```
-usage: PCA_analysis_0.1.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] -related RELATED_FILE [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
+usage: PCA_analysis.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] -related RELATED_FILE [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
                            [--threads THREADS]
 
 This script runs PCA for non-related individualas and projects to related individuals
@@ -358,7 +358,7 @@ For this step there are 3 main outputs:
 `python3 GARSA.py GWAS`
 
 ```
-usage: GWAS_GCTA+BOLT_0.1.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-covar COVAR] [-kinship KINSHIP_GRM]
+usage: GWAS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-covar COVAR] [-kinship KINSHIP_GRM]
                              [--make_king] [-o OUTPUT_FOLDER] [-gcta] [-BoltLmm] [-BoltLD BOLTLD_FILE] [--threads THREADS]
 
 This is a script to GWAS analysis and plot the results with Manhattan plot
@@ -450,7 +450,7 @@ Implemented in R, using LDPred2
 `python3 GARSA.py PRS`
 
 ```
-usage: LDPred_PRS_0.1.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] -mlma GWAS_MLMA [--BOLT] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-n_pcs NUMBER_OF_PCS]
+usage: LDPred_PRS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] -mlma GWAS_MLMA [--BOLT] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-n_pcs NUMBER_OF_PCS]
                          [-covar COVAR_FILE] [-o OUTPUT_FOLDER] [--threads THREADS]
 
 This is a script to GWAS analysis and plot the results with Manhattam plot
