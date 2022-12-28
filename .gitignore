@@ -1,4 +1,5 @@
 memory_log/
 modules/database/dbsnp_hg38p7_b151
-modules/database/dbsnp_hg38p13_b151
+modules/database/dbsnp_hg37p13_b151
+modules/teste
 
