@@ -259,9 +259,9 @@ new_M$ID1 <- NULL
 # Transform dataframe to matrix, and replace row names and column names.
 M <- as.matrix(new_M)
 rownames(M) <- colnames(M) <- colnames(new_M)
-
+M <- pmax(M,0)
 # Pro GCTA: Multiply all elements by 2.
-M_x2<- 2 * M
+M_x2 <- 2 * M
 
 # Write to GCTA format.
 output_grm=paste0(out_path, "/RKinship_for_GRM")

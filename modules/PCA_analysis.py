@@ -790,7 +790,7 @@ if os.path.getsize(related_file) > 0:
 
     pca_total.to_csv(output_pca_total, index=False, sep="\t")
 
-    pca_total.to_csv(output_pca_gwas, index=False, sep=" ")
+    pca_total.to_csv(output_pca_gwas, index=False, sep=" ", header=False)
 
     print(color_text("PCA file for covar in GWAS generated as "+output_pca_gwas))
 

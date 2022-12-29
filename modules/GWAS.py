@@ -19,15 +19,16 @@ from scipy.stats import chi2 #1.7.3
 from scipy import stats #1.7.3
 from numpy import genfromtxt
 from assocplots.qqplot import * #0.0.2
+import warnings
 
 ###############
 ## Functions ##
 ###############
 
 tty_colors = {
-    'green' : '\033[0;32m%s\033[0m',
-    'yellow' : '\033[0;33m%s\033[0m',
-    'red' : '\033[0;31m%s\033[0m'
+	'green' : '\033[0;32m%s\033[0m',
+	'yellow' : '\033[0;33m%s\033[0m',
+	'red' : '\033[0;31m%s\033[0m'
 }
 
 # # or, example if wanting the ones from before with background highlighting
@@ -40,16 +41,16 @@ tty_colors = {
 
 def color_text(text, color='green'):
 
-    if sys.stdout.isatty():
-        return tty_colors[color] % text
-    else:
-        return text
+	if sys.stdout.isatty():
+		return tty_colors[color] % text
+	else:
+		return text
 
 
 def wprint(text):
 
-    print(textwrap.fill(text, width=80, initial_indent="\n  ", 
-          subsequent_indent="    ", break_on_hyphens=False))
+	print(textwrap.fill(text, width=80, initial_indent="\n  ", 
+		  subsequent_indent="    ", break_on_hyphens=False))
 
 # Identificar se o arquivo de fato existe
 
@@ -86,8 +87,8 @@ arg_parser.add_argument("--threads", help = "Number of computer threads -- defau
 #Se nenhum comando foi dado ao script, automaticamente é mostrado o "help"
 
 if len(sys.argv)==1:
-    arg_parser.print_help(sys.stderr)
-    sys.exit(0)
+	arg_parser.print_help(sys.stderr)
+	sys.exit(0)
 
 ##################################
 ### Setting starting variables ###
@@ -155,42 +156,47 @@ if bfile:
 # Se for dada uma path para output
 if output_folder:
 
-    provided_output = os.path.abspath(output_folder)
+	provided_output = os.path.abspath(output_folder)
 
-    # Criar a pasta do usuário na path providenciada
-    try:
-    	os.mkdir(provided_output)
-    except:
-    	print("\n")
+	# Criar a pasta do usuário na path providenciada
+	try:
+		os.mkdir(provided_output)
+	except:
+		print("\n")
 
-    out_dir_path = provided_output
+	out_dir_path = provided_output
 
-    print(color_text("Using specified directory for output: " + output_folder, "green"))
+	print(color_text("Using specified directory for output: " + output_folder, "green"))
 
 else:
-    #Se não for dado um output, usar o diretório atual
-    output_folder = os.getcwd()
+	#Se não for dado um output, usar o diretório atual
+	output_folder = os.getcwd()
 
-    out_dir_path = output_folder
+	out_dir_path = output_folder
 
-    print(color_text("No output directory specified, using current working directory: " + out_dir_path, "yellow"))
+	print(color_text("No output directory specified, using current working directory: " + out_dir_path, "yellow"))
 
 temp_files = os.path.join(out_dir_path, "tmp")
 try:
-    os.mkdir(temp_files)
+	os.mkdir(temp_files)
 except:
-    print(color_text("tmp folder exists, will keep using it"))
+	print(color_text("tmp folder exists, will keep using it"))
 
 
 
 print(color_text("Using "+str(threads)+" Threads"))
 
 if not plink_path:
-    plink_look_path = subprocess.run(["which", "plink1.9"], stdout=subprocess.PIPE, text=True)
-    plink_path = plink_look_path.stdout.strip()
+	plink_look_path = subprocess.run(["which", "plink1.9"], stdout=subprocess.PIPE, text=True)
+	plink_path = plink_look_path.stdout.strip()
 
 if not bolt_ld:
 	bolt_ld = os.path.join(database_path, "bolt-data", "LDSCORE.1000G_EUR.tab.gz")
+
+
+covar = os.path.abspath(covar)
+qcovar = os.path.abspath(qcovar)
+pheno = os.path.abspath(pheno)
 
 #######################
 ## Starting analysis ##
@@ -355,34 +361,31 @@ if bolt_run == True:
 	total_n_of_SNPS = len(genfromtxt(bfile+".bim", delimiter=' '))
 
 	gwas_start = time.time()
-	print(color_text("Starting the GWAS regression using Linear Mixed Model (LMM)", "yellow"))
+	print(color_text("Starting the BOLT GWAS regression using Linear Mixed Model (LMM)", "yellow"))
 
 	if args_dict["quantitative_covar"] is not None and args_dict["covar"] is not None: #Se foi fornecido ambos covar e qcovar
 		
 		print(color_text("Using covar and qcovar for regression", "yellow"))
+
+		bolt_covars = os.path.join(temp_files, "bolt_covars.tsv")
 
 		gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_qcovar_covar_GWAS")
 
 
 		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
 
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
+		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python", header=None)
 
 		pheno_col = get_pheno_col.columns.tolist()[-1]
 
-		## Como a quantidade de valores de covar e qcovars pode ser variavel faremos primeiro uma lista com todos os valores que são fixos
-		## bfile, phenoFile, phenoCol e covarFile precisam estar presentes -- Lembrando que o fenótipo é apenas 1 e permite que fique "Fixo" no código
-
-		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
-		"--covarUseMissingIndic",
-		"--LDscoresFile"+str(bolt_ld),"--lmm",
-		"--phenoFile="+str(pheno), 
-		"--phenoCol="+str(pheno_col),
-		"--covarFile="+str(covar)]
-
+		
 		## Agora podemos seguir em frente e a partir dos arquivos fornecidos gerar o restante dos comandos
 
-		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
+		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python", header=None)
+
+		covar_cols = get_covars_cols.columns.tolist()
+
+		get_covars_cols.rename(columns={covar_cols[0]: "FID", covar_cols[1]: "IID"}, inplace=True)
 
 		covars_data = get_covars_cols.columns.tolist()[2:]
 
@@ -396,9 +399,27 @@ if bolt_run == True:
 
 		qcovars_command = ["--qCovarCol="+str(x) for x in qcovars_data]
 
+		bolt_covars_df = pd.merge(get_covars_cols, get_qcovars_cols, on=["FID", "IID"], how="left")
+
+		bolt_covars_df.to_csv(bolt_covars, index=False, sep="\t")
+
+		## Como a quantidade de valores de covar e qcovars pode ser variavel faremos primeiro uma lista com todos os valores que são fixos
+		## bfile, phenoFile, phenoCol e covarFile precisam estar presentes -- Lembrando que o fenótipo é apenas 1 e permite que fique "Fixo" no código
+
+		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+		"--covarUseMissingIndic",
+		"--LDscoresFile="+str(bolt_ld),"--lmm",
+		"--phenoFile="+str(pheno), 
+		"--phenoCol="+str(pheno_col),
+		"--covarFile="+str(bolt_covars)]
+
 		## Agora vamos gerar a lista com os comandos finais
 
 		final_commands = start_command + covars_command + qcovars_command
+
+		with open("teste", "w") as f:
+			for i in final_commands:
+				f.write(i+"\n")
 
 		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
 		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
@@ -424,20 +445,20 @@ if bolt_run == True:
 
 		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
 
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
+		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python", header=None)
 
 		pheno_col = get_pheno_col.columns.tolist()[-1]
 
 		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
 		"--covarUseMissingIndic",
-		"--LDscoresFile"+str(bolt_ld),"--lmm",
+		"--LDscoresFile="+str(bolt_ld),"--lmm",
 		"--phenoFile="+str(pheno), 
 		"--phenoCol="+str(pheno_col),
 		"--covarFile="+str(covar)]
 
 		## Nesse caso, foi fornecido apenas o arquivo de covars
 
-		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
+		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python", header=None)
 
 		covars_data = get_covars_cols.columns.tolist()[2:]
 
@@ -470,13 +491,13 @@ if bolt_run == True:
 
 		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
 
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
+		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python", heade=None)
 
 		pheno_col = get_pheno_col.columns.tolist()[-1]
 
 		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
 		"--covarUseMissingIndic",
-		"--LDscoresFile"+str(bolt_ld),"--lmm",
+		"--LDscoresFile="+str(bolt_ld),"--lmm",
 		"--phenoFile="+str(pheno), 
 		"--phenoCol="+str(pheno_col),
 		"--covarFile="+str(covar)]
@@ -541,11 +562,11 @@ if gcta_run:
 
 	gen_infl_list = [] #Lista que vai conter todos os valores de genomic inflation
 	for i in range(1,23):
-	    chr_temp = gwas_summary[gwas_summary["Chr"] == i]
-	    median = chr_temp["Chi2"].median()
-	    gen_infl = median/chi2.ppf(0.5,1)
-	    gen_infl_list.append([gen_infl, i])
-	    print("The inflation found for chr"+str(i)+" is"+str(gen_infl))
+		chr_temp = gwas_summary[gwas_summary["Chr"] == i]
+		median = chr_temp["Chi2"].median()
+		gen_infl = median/chi2.ppf(0.5,1)
+		gen_infl_list.append([gen_infl, i])
+		print("The inflation found for chr "+str(i)+" is "+str(gen_infl))
 
 	temp_df = pd.DataFrame(gen_infl_list, columns=["genomic_inf_by_chr", "Chr"]) #Dataframe criado para conter os resultados de genomic inflation
 
@@ -567,7 +588,7 @@ if gcta_run:
 
 	print(color_text("Saving the GWAS table with adjusted pvalue as "+gwas_pvalue_adjusted))
 
-	gwas_pvalue_adjusted.to_csv(gwas_pvalue_adjusted, index=False)
+	gwas_adjusted.to_csv(gwas_pvalue_adjusted, index=False)
 
 	gc_end = time.time()
 
@@ -604,12 +625,12 @@ if bolt_run:
 
 	gen_infl_list = [] #Lista que vai conter todos os valores de genomic inflation
 	for i in range(1,23):
-	    chr_temp = gwas_summary[gwas_summary["CHR"] == i]
-	    median = chr_temp["Chi2"].median()
-	    gen_infl = median/chi2.ppf(0.5,1)
-	    gen_infl_list.append([gen_infl, i])
+		chr_temp = gwas_summary[gwas_summary["CHR"] == i]
+		median = chr_temp["Chi2"].median()
+		gen_infl = median/chi2.ppf(0.5,1)
+		gen_infl_list.append([gen_infl, i])
 
-	    print("The inflation found for chr"+str(i)+" is"+str(gen_infl))
+		print("The inflation found for chr"+str(i)+" is "+str(gen_infl))
 
 	temp_df = pd.DataFrame(gen_infl_list, columns=["genomic_inf_by_chr", "CHR"]) #Dataframe criado para conter os resultados de genomic inflation
 
@@ -631,7 +652,7 @@ if bolt_run:
 
 	print(color_text("Saving the GWAS table with adjusted pvalue as "+gwas_pvalue_adjusted))
 
-	gwas_pvalue_adjusted.to_csv(gwas_pvalue_adjusted, index=False)
+	gwas_adjusted.to_csv(gwas_pvalue_adjusted, index=False)
 
 	gc_end = time.time()
 
@@ -650,10 +671,10 @@ if gcta_run:
 
 	gwas_adjusted_group = gwas_adjusted.groupby(("Chr")) #Group by serve para segregar o plot por cromossomo
 
-if bolt_path:
+if bolt_run:
 	gwas_adjusted_group = gwas_adjusted.groupby(("CHR"))
 ##PLOTING##
-
+print(color_text("Plotting Manhatam Plot"))
 #Para isso vamos precisar de algumas bibliotecas extras
 
 fig = plt.figure(figsize=(20, 8)) # Set the figure size
@@ -665,9 +686,9 @@ x_labels_pos = []
 
 
 for num, (name, group) in enumerate(gwas_adjusted_group):
-    group.plot(kind='scatter', x='ind', y='-log10_pvalue',color=colors[num % len(colors)], ax=ax)
-    x_labels.append(name)
-    x_labels_pos.append((group['ind'].iloc[-1] - (group['ind'].iloc[-1] - group['ind'].iloc[0])/2))
+	group.plot(kind='scatter', x='ind', y='-log10_pvalue',color=colors[num % len(colors)], ax=ax)
+	x_labels.append(name)
+	x_labels_pos.append((group['ind'].iloc[-1] - (group['ind'].iloc[-1] - group['ind'].iloc[0])/2))
 ax.set_xticks(x_labels_pos)
 ax.set_xticklabels(x_labels, fontsize=12)
 
@@ -679,28 +700,36 @@ plt.axhline(y = -np.log10(5e-8), color = 'b', linestyle = '--')
 
 #Save to Output
 
-plot_manhattam_out = os.path.join(out_dir_path, "Manhattam_plot_"+base_name+".pdf")
+plot_manhattam_out = os.path.join(out_dir_path, "Manhattam_plot_"+base_name+".png")
 
 plt.savefig(plot_manhattam_out, dpi=300)
 
 
 #QQ plot
 
-fig = plt.figure(figsize=(10,10))
-qqplot([gwas_adjusted["Corrected_pvalues"]],
-       ["p-values"],
-       color=['b'], 
-       fill_dens=[0.2], 
-       error_type='theoretical', 
-       distribution='beta',
-       title='')
-plt.legend(fontsize=20)
+# gwas_adjusted = gwas_adjusted[gwas_adjusted["Corrected_pvalues"] != 0]
+print(color_text("Plotting QQ Plot"))
 
-#QQ output
+try:
+	with warnings.catch_warning():
+		warnings.simplefilter("ignore")
+	fig = plt.figure(figsize=(10,10))
+	qqplot([gwas_adjusted["Corrected_pvalues"]],
+		["p-values"],
+		color=['b'], 
+		fill_dens=[0.2], 
+		error_type='theoretical', 
+		distribution='beta',
+		title='')
+	plt.legend(fontsize=20)
 
-qq_output = os.path.join(out_dir_path, "QQ_plot"+base_name+".pdf")
+	#QQ output
 
-plt.savefig(qq_output, dpi=300)
+	qq_output = os.path.join(out_dir_path, "QQ_plot"+base_name+".pdf")
+
+	plt.savefig(qq_output, dpi=300)
+except:
+	print(color_text("WARNING: QQ plot, with the GWAS_summary_adjusted_pvalues.csv the plot can be manualy plotted if not found in output folder", "yellow"))
 
 plot_end = time.time()
 
