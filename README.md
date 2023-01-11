@@ -95,7 +95,7 @@ optional arguments:
 `python3 GARSA.py desdup`
 
 ```
-usage: deduplication.py [-h] -vcf VCF_FILE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] -plink2 PLINK2_PATH [--threads THREADS]
+usage: deduplication.py [-h] -vcf VCF_FILE [-bcftools BCFTOOLS_PATH] [-o OUTPUT_FOLDER] [-plink2 PLINK2_PATH] [--threads THREADS]
 
 This is a script to identify and remove duplicated SNPs
 
@@ -104,11 +104,11 @@ optional arguments:
   -vcf VCF_FILE, --vcf_file VCF_FILE
                         File for processing, requierd for script execution
   -bcftools BCFTOOLS_PATH, --bcftools_path BCFTOOLS_PATH
-                        Path for the bcftools executable, requierd for script execution
+                        Path for the bcftools executable, requierd for script execution -- default is to look for the variable on path
   -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
                         Wanted output folder (default: current output folder)
   -plink2 PLINK2_PATH, --plink2_path PLINK2_PATH
-                        Path for the plink2 executable, requierd for script execution
+                        Path for the plink2 executable, requierd for script execution -- default is to look for the variable on path
   --threads THREADS     Number of computer threads -- default = 1
 ```
 
@@ -125,16 +125,22 @@ Usage:
 `python3 GARSA.py update_rsID` 
 
 ```
-usage: update_rsID.py [-h] -vcf VCF_FILE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] [-rm_tmp] [--threads THREADS]
+usage: update_rsID.py [-h] [-vcf VCF_FILE] [-ref_hg REF_BUILD] [-bcftools BCFTOOLS_PATH] [-plink2 PLINK2_PATH] [-plink PLINK_PATH] [-o OUTPUT_FOLDER] [-rm_tmp] [--threads THREADS]
 
-This is a script to update SNP rsIDs (for hg19). This script assumes that your file have the pattern chr[1-22]_any_name.extensions
+This is a script to update SNP rsIDs (for hg19). This script assumes that your file name have the pattern chr[1-22], e.g project_name_chr12.extensions
 
 optional arguments:
   -h, --help            show this help message and exit
   -vcf VCF_FILE, --vcf_file VCF_FILE
                         File for processing, requierd for script execution
+  -ref_hg REF_BUILD, --ref_build REF_BUILD
+                        Select the human genome build version -- hg37 or hg38, default=hg37
   -bcftools BCFTOOLS_PATH, --bcftools_path BCFTOOLS_PATH
-                        Path for the bcftools executable, requierd for script execution
+                        Path for the bcftools executable, requierd for script execution -- default is to look for the variable on path
+  -plink2 PLINK2_PATH, --plink2_path PLINK2_PATH
+                        Path for the Plink2 executable, requierd for script execution -- default is to look for the variable on path
+  -plink PLINK_PATH, --plink_path PLINK_PATH
+                        Path for the Plink1.9 executable, requierd for script execution -- default is to look for the variable on path
   -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
                         Wanted output folder (default: current output folder)
   -rm_tmp, --rm_temp_files
@@ -165,7 +171,7 @@ For this module to work, the user need to provide a table formated as OLD SAMPLE
 `python3 GARSA.py rename_sample_id`
 
 ```
-usage: rename_sample_id.py [-h] -vcf VCF_FILE -table SAMPLE_TABLE -bcftools BCFTOOLS_PATH [-o OUTPUT_FOLDER] [--threads THREADS]
+usage: rename_sample_id.py [-h] -vcf VCF_FILE -table SAMPLE_TABLE [-bcftools BCFTOOLS_PATH] [-o OUTPUT_FOLDER] [--threads THREADS]
 
 This script updates the Sample IDs of a VCF file, for this the user must provide a tab or comma separated file with Old sample ID on the first column and the New sample ID in the seconda column
 
@@ -176,7 +182,7 @@ optional arguments:
   -table SAMPLE_TABLE, --sample_table SAMPLE_TABLE
                         File with OLD_SAMPLE_ID<tab>NEW_SAMPLE_ID
   -bcftools BCFTOOLS_PATH, --bcftools_path BCFTOOLS_PATH
-                        Path for the bcftools executable, requierd for script execution
+                        Path for the bcftools executable, requierd for script execution -- default is to look for the variable on path
   -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
                         Wanted output folder (default: current output folder)
   --threads THREADS     Number of computer threads -- default = 1
@@ -192,8 +198,8 @@ This module executes variant quality controls
 `python3 GARSA.py quality_control` 
 
 ```
-usage: SNP_QC.py [-h] -vcf VCF_FILE [-bcftools BCFTOOLS_PATH] [-plink2 PLINK2_PATH] [-o OUTPUT_FOLDER] [-geno GENO_PLINK] [-maf MAF_PLINK] [-HWE HARDY] [-use_HWE USE_HARDY] [-R2 R_SQUARED]
-                       [-INFO INFO_SCORE] [--score_type SCORE_TYPE] [--threads THREADS]
+usage: SNP_QC.py [-h] -vcf VCF_FILE [-bcftools BCFTOOLS_PATH] [-plink2 PLINK2_PATH] [-o OUTPUT_FOLDER] [-geno GENO_PLINK] [-maf MAF_PLINK] [-HWE HARDY] [-use_HWE] [-R2 R_SQUARED] [-INFO INFO_SCORE]
+                 [--score_type SCORE_TYPE] [--no_score] [--threads THREADS]
 
 This is a script runs standard QC process for imputed datasets
 
@@ -202,7 +208,7 @@ optional arguments:
   -vcf VCF_FILE, --vcf_file VCF_FILE
                         File for processing, requierd for script execution
   -bcftools BCFTOOLS_PATH, --bcftools_path BCFTOOLS_PATH
-                        Path for the bgzip executable, requierd for script execution -- default is to look for the variable on path
+                        Path for the bcftools executable, requierd for script execution -- default is to look for the variable on path
   -plink2 PLINK2_PATH, --plink2_path PLINK2_PATH
                         Path for the plink2 executable, requierd for script execution -- default is to look for the variable on path
   -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
@@ -213,7 +219,7 @@ optional arguments:
                         Threshold value for minor allele frequency (MAF) -- default=0.01
   -HWE HARDY, --hardy HARDY
                         Check for SNPs which are not in Hardy-Weinberg equilibrium (HWE) -- default=1e-6
-  -use_HWE USE_HARDY, --use_hardy USE_HARDY
+  -use_HWE, --use_hardy
                         Define if the HWE analysis will be run -- default:False
   -R2 R_SQUARED, --r_squared R_SQUARED
                         Imputation r-squared threshold value -- default >= 0.8 (Use this flag when dataset was imputed using MIS (Michigan Imputation Server))
@@ -221,28 +227,19 @@ optional arguments:
                         Imputation INFO score threshold value -- default >= 0.5 (Use this flag when dataset was imputed using IMPUTE5)
   --score_type SCORE_TYPE
                         Select r2 or info for imputation score filter -- default: r2
+  --no_score            Dataset with no imputation score -- default: False
   --threads THREADS     Number of computer threads -- default = 1
-
 ```
 
 The flag `-vcf` is required, and also the flags ` -geno -maf -R2 --score-type and -use_HWE` are important for the user to pay attention  
 
 Usage:
-`python3 GARSA.py quality_control -vcf chr22_pop1.vcf.gz -bcftools path/to/bcftools/executable -plink2 path/to/plink2/executable -plink path/to/plink/executable`
+`python3 GARSA.py quality_control -vcf chr22_pop1.vcf.gz -o path/to/ouput_folder --score_type info`
 
-Before continuing with the next steps the user should concatenate all chromosomes into one VCF file.
+Before continuing with the next steps we recommend that the user concatenate all chromosomes into one VCF file.
 Sugestion --> `bcftools concat -Oz -o concatenated_file.vcf.gz chr{1..22}.vcf.gz`
 
-This script works as a loop, and the `{1..22}` will iterate over the files as such:
-
-chr1.vcf.gz
-chr2.vcf.gz
-.
-.
-.
-chr22.vcf.gz
-
-This suggestion for concatenation aims to guarantee correct sample quality control
+This suggestion for concatenation aims to guarantee correct sample quality control, and avoid generating chromosome files with different samples filtered
 
 #### Sample quality control
 
@@ -280,10 +277,10 @@ This is an important module, aiming the kinship analysis with corrections for ad
 `python3  GARSA.py kinship` 
 
 ```
-usage: Kinship_and_correction.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
-                                     [--degree DEGREE] [--threads THREADS]
+usage: Kinship_and_correction.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2] [--degree DEGREE]
+                                 [--threads THREADS]
 
-This is a script to run kinship analysis corrected by values from population stratification
+This is a script to run kinship analysis and correct the values using population stratification
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -300,7 +297,6 @@ optional arguments:
   --prune_r2 PRUNE_R2   R2 value for prunning-- default = 0.03
   --degree DEGREE       Degree for relatedeness (INT --> 1, 2 or 3) -- default = 2nd degree [2]
   --threads THREADS     Number of computer threads -- default = 1
-
 ```
 
 The flag `-vcf` is required for execution and the flag `---window_size  --sliding_window  --prune_r2  --degree` are important for the user to pay attention
@@ -323,7 +319,7 @@ This module runs the PCA analysis in 4 main steps.
 
 ```
 usage: PCA_analysis.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] -related RELATED_FILE [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
-                           [--threads THREADS]
+                       [--threads THREADS] [--garsa_path GARSA_PATH]
 
 This script runs PCA for non-related individualas and projects to related individuals
 
@@ -343,13 +339,14 @@ optional arguments:
                         Sliding Window step -- default = 50
   --prune_r2 PRUNE_R2   R2 value for prunning-- default = 0.03
   --threads THREADS     Number of computer threads -- default = 1
-
+  --garsa_path GARSA_PATH
+                        Path to main script GARSA -- always provided by default
 ```
 The flag `-vcf and -related` are required for execution and the flags `---window_size  --sliding_window and --prune_r2` are important for the user to pay attention
 
 For this step there are 3 main outputs:
 1. table_for_plot.tsv --> Table with PC information, predicted population and Sample ID for all samples
-2. file_name>_PCA_total.txt --> Output with all the information about the PCs for related and unralted samples
+2. <file_name>_PCA_total.txt --> Output with all the information about the PCs for related and unralted samples
 3. PC_plots_PCA1.pdf --> File with all PCA plots for user visualization 
 
 
@@ -358,10 +355,10 @@ For this step there are 3 main outputs:
 `python3 GARSA.py GWAS`
 
 ```
-usage: GWAS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-covar COVAR] [-kinship KINSHIP_GRM]
-                             [--make_king] [-o OUTPUT_FOLDER] [-gcta] [-BoltLmm] [-BoltLD BOLTLD_FILE] [--threads THREADS]
+usage: GWAS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-covar COVAR] [-kinship KINSHIP_GRM] [--make_king] [-o OUTPUT_FOLDER]
+               [-gcta] [-BoltLmm] [-BoltLD BOLTLD_FILE] [--threads THREADS]
 
-This is a script to GWAS analysis and plot the results with Manhattan plot
+This is a script to GWAS analysis and plot the results with Manhattam plot
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -374,11 +371,11 @@ optional arguments:
   -pheno PHENOTYPE_FILE, --phenotype_file PHENOTYPE_FILE
                         Path for the phenotype file, this file must have FID and IID (like the .fam file) and must be separated by tab or space. Header is not mandatory
   -qcovar QUANTITATIVE_COVAR, --quantitative_covar QUANTITATIVE_COVAR
-                        Path for the quantitative covariables, e.g. PCs, age, and other continuous variables. The file must have FID and IID (like the phenotype file and .fam. The file must be
-                        separated by tab or space. Header is not mandatory
+                        Path for the quantitative covariables, e.g. PCs, age, and other continuous variables. The file must have FID and IID (like the phenotype file and .fam. The file must be separated by tab
+                        or space. Header is not mandatory
   -covar COVAR, --covar COVAR
-                        Path for the covariables, e.g. Sex and other qualitative variables. The file must have FID and IID (like the phenotype file and .fam. The file must be separated by tab or space.
-                        Header is not mandatory
+                        Path for the covariables, e.g. Sex and other qualitative variables. The file must have FID and IID (like the phenotype file and .fam. The file must be separated by tab or space. Header
+                        is not mandatory
   -kinship KINSHIP_GRM, --kinship_grm KINSHIP_GRM
                         Path for the kinship grm file generated by the kinship script, if user wishes the kinship analysis can be generated with the flag --make-king
   --make_king           Make the kinship analysis (no correction by admixture
@@ -388,9 +385,8 @@ optional arguments:
   -BoltLmm, --BoltLmm_run
                         Select Bolt-lmm for GWAS -- recomended for N samples > 5000
   -BoltLD BOLTLD_FILE, --BoltLD_file BOLTLD_FILE
-                        Path for the Bolt-lmm LD file -- Provided by the BOLT-LMM distribution
+                        Path for the Bolt-lmm LD file -- default: File provided by the BOLT-LMM distribution
   --threads THREADS     Number of computer threads -- default = 1
-
 ```
 
 In this step the user must provide a phenotype, covariates (covar), quantitative covariates (qcovar) and kinship files  
@@ -450,8 +446,8 @@ Implemented in R, using LDPred2
 `python3 GARSA.py PRS`
 
 ```
-usage: LDPred_PRS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-bfile PLINK_BINARY_PREFIX] -mlma GWAS_MLMA [--BOLT] [-pheno PHENOTYPE_FILE] [-qcovar QUANTITATIVE_COVAR] [-n_pcs NUMBER_OF_PCS]
-                         [-covar COVAR_FILE] [-o OUTPUT_FOLDER] [--threads THREADS]
+usage: LDPred_PRS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-plink2 PLINK2_PATH] [-bfile PLINK_BINARY_PREFIX] -mlma GWAS_MLMA [--BOLT] [-pheno PHENOTYPE_FILE] [--pheno_col PHENO_COL]
+                     [-qcovar QUANTITATIVE_COVAR] [-n_pcs NUMBER_OF_PCS] [-covar COVAR_FILE] [-o OUTPUT_FOLDER] [--threads THREADS]
 
 This is a script to GWAS analysis and plot the results with Manhattam plot
 
@@ -461,13 +457,17 @@ optional arguments:
                         File for PRS analysis, required if user dont have Plink binary files (Same file as used for GWAS)
   -plink PLINK_PATH, --plink_path PLINK_PATH
                         Path for the plink(1.9) executable -- default is to look for the variable on path
+  -plink2 PLINK2_PATH, --plink2_path PLINK2_PATH
+                        Path for the Plink2 executable, requierd for script execution -- default is to look for the variable on path
   -bfile PLINK_BINARY_PREFIX, --plink_binary_prefix PLINK_BINARY_PREFIX
                         Path for the plink(1.9) binary file, provide only the prefix (no extensions) -- Same used in the GWAS setp
   -mlma GWAS_MLMA, --GWAS_mlma GWAS_MLMA
                         Output file from de GWAS step -- the extension of this file is .mlma for GCTA and .stats for BOLT-LMM
   --BOLT                Use this flag if the BOLT-LMM output (.stats) was provided
   -pheno PHENOTYPE_FILE, --phenotype_file PHENOTYPE_FILE
-                        Path for the phenotype file, this file must have FID and IID (like the .fam file) and must be separated by tab or space. Header is not mandatory
+                        Path for the phenotype file, this file must have FID and IID (like the .fam file) and must be separated by tab or space. Same used on the GWAS setp
+  --pheno_col PHENO_COL
+                        Name of the columns contaning the Phenotype data -- Default is to look for 'Phenotype' as the column name
   -qcovar QUANTITATIVE_COVAR, --quantitative_covar QUANTITATIVE_COVAR
                         Path for the quantitative covariables, e.g. PCs, age, and other continuous variables. The same used on the GWAS step
   -n_pcs NUMBER_OF_PCS, --number_of_pcs NUMBER_OF_PCS
@@ -477,10 +477,22 @@ optional arguments:
   -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
                         Wanted output folder (default: current output folder)
   --threads THREADS     Number of computer threads -- default = 1
-
 ```
 On this step the user must provide all the files (covar, qcovar and phenotype) used on the GWAS step -- Important: use the flag `-n_pcs` to provide the number of PCs used on the step above (GWAS).
 
 **IMPORTANT: The qcovar file *MUST* be provided with the PCA information. Also, the generated outputs on the GWAS step (.mlma or .stats) must be provided aswell.**
 
 As a result, a table containing the PRS values and different graphs associated with the distribution of the PRS and the distribution of risk deciles are given, being able to identify which samples fall into each risk decile
+    
+## Resources used for a population with n=49 samples with around one milion variants:
+    
+| Module | Time | Peak Mem (Gb) | Threads |
+| ------ | ------ | ------ | ------ |
+| desdup | 00:00:04 | 0.2 | 4 |
+| update_rsID | 00:00:22 | 0.12 | 4 |
+| quality_control | 00:00:03 | 0.2 | 4 |
+| quality_ind | 00:00:05 | 0.2 | 4 |
+| kinship | 00:00:08 | 0.7 | 4 |
+| PCA | 00:00:15 | 0.3 | 4 |
+| GWAS | 00:02:20 | 1.3 | 4 |
+| PRS | 05:20:00 | 14.8 | 4 |
