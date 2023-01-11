@@ -125,7 +125,7 @@ qcovar = args_dict["quantitative_covar"]
 covar = args_dict["covar"]
 kinship = args_dict["kinship_grm"]
 make_king = args_dict["make_king"]
-bolt_path = os.path.join(script_path, "BOLT-LMM_v2.4", "bolt")
+bolt_path = os.path.join(script_path, "BOLT-LMM_v2.4")
 bolt_run = args_dict["BoltLmm_run"]
 bolt_ld = args_dict["BoltLD_file"]
 
@@ -193,9 +193,10 @@ if not plink_path:
 if not bolt_ld:
 	bolt_ld = os.path.join(database_path, "bolt-data", "LDSCORE.1000G_EUR.tab.gz")
 
-
-covar = os.path.abspath(covar)
-qcovar = os.path.abspath(qcovar)
+if covar:
+	covar = os.path.abspath(covar)
+if qcovar:
+	qcovar = os.path.abspath(qcovar)
 pheno = os.path.abspath(pheno)
 
 #######################
@@ -354,8 +355,8 @@ if gcta_run == True:
 			exit(1)
 
 if bolt_run == True:
-
-	if not os.path.exists(bolt_path):
+	exec_bolt = os.path.join(bolt_path, "bolt")
+	if not os.path.exists(exec_bolt):
 		print(color_text("WARNING: executable for bolt-lmm not found in "+str(script_path), "yellow"))
 
 	total_n_of_SNPS = len(genfromtxt(bfile+".bim", delimiter=' '))
@@ -374,14 +375,14 @@ if bolt_run == True:
 
 		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
 
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python", header=None)
+		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
 
 		pheno_col = get_pheno_col.columns.tolist()[-1]
 
 		
 		## Agora podemos seguir em frente e a partir dos arquivos fornecidos gerar o restante dos comandos
 
-		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python", header=None)
+		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
 
 		covar_cols = get_covars_cols.columns.tolist()
 
@@ -406,7 +407,7 @@ if bolt_run == True:
 		## Como a quantidade de valores de covar e qcovars pode ser variavel faremos primeiro uma lista com todos os valores que são fixos
 		## bfile, phenoFile, phenoCol e covarFile precisam estar presentes -- Lembrando que o fenótipo é apenas 1 e permite que fique "Fixo" no código
 
-		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+		start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
 		"--covarUseMissingIndic",
 		"--LDscoresFile="+str(bolt_ld),"--lmm",
 		"--phenoFile="+str(pheno), 
@@ -416,16 +417,29 @@ if bolt_run == True:
 		## Agora vamos gerar a lista com os comandos finais
 
 		final_commands = start_command + covars_command + qcovars_command
+		total_linhas = len(final_commands)
 
-		with open("teste", "w") as f:
+		bolt_script = os.path.join(temp_files, "run_bolt.sh")
+		with open(bolt_script, "w") as f:
+			count=1
+			f.write("#!/bin/bash"+"\n")
+			f.write(f"cd {bolt_path}"+"\n")
 			for i in final_commands:
-				f.write(i+"\n")
+				if count == 1:
+					f.write(i+" \\"+"\n")
+					count+=1
+				elif count == total_linhas:
+					f.write("\t"+i)
+				else:
+					f.write("\t"+i+" \\"+"\n")
+					count+=1
+				
 
 		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
 		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
 
 		try:
-			_try = subprocess.run(final_commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+			_try = subprocess.run(["bash", bolt_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 			with open(bolt_qvocar_covar_err, "w") as err:
 				err.write(_try.stderr)
 			with open(bolt_qvocar_covar_out, "w") as out:
@@ -445,11 +459,11 @@ if bolt_run == True:
 
 		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
 
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python", header=None)
+		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
 
 		pheno_col = get_pheno_col.columns.tolist()[-1]
 
-		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+		start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
 		"--covarUseMissingIndic",
 		"--LDscoresFile="+str(bolt_ld),"--lmm",
 		"--phenoFile="+str(pheno), 
@@ -458,7 +472,7 @@ if bolt_run == True:
 
 		## Nesse caso, foi fornecido apenas o arquivo de covars
 
-		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python", header=None)
+		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
 
 		covars_data = get_covars_cols.columns.tolist()[2:]
 
@@ -466,6 +480,22 @@ if bolt_run == True:
 	
 
 		final_commands = start_command + covars_command
+		total_linhas = len(final_commands)
+
+		bolt_script = os.path.join(temp_files, "run_bolt.sh")
+		with open(bolt_script, "w") as f:
+			count=1
+			f.write("#!/bin/bash"+"\n")
+			f.write(f"cd {bolt_path}"+"\n")
+			for i in final_commands:
+				if count == 1:
+					f.write(i+" \\"+"\n")
+					count+=1
+				elif count == total_linhas:
+					f.write("\t"+i)
+				else:
+					f.write("\t"+i+" \\"+"\n")
+					count+=1
 
 		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
 		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
@@ -491,16 +521,16 @@ if bolt_run == True:
 
 		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
 
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python", heade=None)
+		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
 
 		pheno_col = get_pheno_col.columns.tolist()[-1]
 
-		start_command = [bolt_path, "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
+		start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
 		"--covarUseMissingIndic",
 		"--LDscoresFile="+str(bolt_ld),"--lmm",
 		"--phenoFile="+str(pheno), 
 		"--phenoCol="+str(pheno_col),
-		"--covarFile="+str(covar)]
+		"--covarFile="+str(qcovar)]
 
 		## Nesse caso, foi fornecido apenas o arquivo de qcovars
 
@@ -511,6 +541,22 @@ if bolt_run == True:
 		qcovars_command = ["--qCovarCol="+str(x) for x in qcovars_data]
 
 		final_commands = start_command + qcovars_command
+		total_linhas = len(final_commands)
+
+		bolt_script = os.path.join(temp_files, "run_bolt.sh")
+		with open(bolt_script, "w") as f:
+			count=1
+			f.write("#!/bin/bash"+"\n")
+			f.write(f"cd {bolt_path}"+"\n")
+			for i in final_commands:
+				if count == 1:
+					f.write(i+" \\"+"\n")
+					count+=1
+				elif count == total_linhas:
+					f.write("\t"+i)
+				else:
+					f.write("\t"+i+" \\"+"\n")
+					count+=1
 
 		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
 		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
@@ -608,7 +654,7 @@ if bolt_run:
 
 	#Gerar coluna com 1-pvalue
 
-	p_value_index = bolt.iloc[:,[-1]].columns.tolist()[0]
+	p_value_index = gwas_summary.iloc[:,[-1]].columns.tolist()[0]
 
 
 	gwas_summary["1-pvalue"] = 1-gwas_summary.iloc[:,-1]
@@ -638,7 +684,7 @@ if bolt_run:
 
 	gwas_adjusted = pd.merge(gwas_summary, temp_df, on="CHR", how="left")
 
-	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["p"]/gwas_adjusted["genomic_inf_by_chr"]
+	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted[p_value_index]/gwas_adjusted["genomic_inf_by_chr"]
 
 	print(color_text("Plotting the data with Manhattam and QQ plots", "yellow"))
 

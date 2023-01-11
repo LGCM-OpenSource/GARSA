@@ -245,7 +245,7 @@ try:
 	with open(form_bim_out, "w") as out:
 		out.write(_try.stdout)
 	if _try.stderr:
-		print(color_text("WARNING: Plink2. Check error log file "+form_bim_err, "red"))
+		print(color_text("WARNING: Plink2. Check error log file "+form_bim_err, "yellow"))
 
 except:
 	print(color_text("Error on Plink2 execution", "red"))
