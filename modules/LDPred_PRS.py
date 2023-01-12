@@ -372,9 +372,32 @@ output_PRS = os.path.join(out_dir_path, "PRS_scores")
 PRS_err = os.path.join(temp_files, "PRS_score.err")
 PRS_out = os.path.join(temp_files, "PRS_score.out")
 
+print(color_text("Calculating allele frequencies"))
+## ADD ESSA PARTE!!
+#plink2 --bfile /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/testes_pipe/tmp/GARSA_final_example_for_LDPRED --out /home/fernando/lgcm/projects/Pipeline_FOXCONN/dev/scripts/testes_pipe/tmp/TESTE_LDPRED2_freqs --freq
+freq_out_plink = os.path.join(temp_files, "LDPred_frequencies") #+.afreq
+
+freq_err = os.path.join(temp_files, "freq.err")
+freq_out = os.path.join(temp_files, "freq.out")
+try:
+	_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", freq_out_plink, "--freq", 
+	"--threads", threads], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	with open(freq_err, "w") as err:
+		err.write(_try.stderr)
+	with open(freq_out, "w") as out:
+		out.write(_try.stdout)
+	if _try.stderr:
+		print(color_text("WARNING: Plink2. Check error log file "+freq_err, "yellow"))
+
+except:
+	print(color_text("Error on Plink2 execution", "red"))
+	print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+	print(color_text("Error log is stored in "+freq_err, "yellow"))
+	exit(1)
+
 try:
 	_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", in_weight_scores, "1", "2", "3", "header-read", "cols=scoresums", 
-	"--threads", threads], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	"--threads", threads, "--read-freq", freq_out+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	with open(PRS_err, "w") as err:
 		err.write(_try.stderr)
 	with open(PRS_out, "w") as out:
