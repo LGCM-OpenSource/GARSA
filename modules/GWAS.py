@@ -19,6 +19,7 @@ from scipy.stats import chi2 #1.7.3
 from scipy import stats #1.7.3
 from numpy import genfromtxt
 from assocplots.qqplot import * #0.0.2
+import statsmodels
 import warnings
 
 ###############
@@ -620,7 +621,11 @@ if gcta_run:
 
 	gwas_adjusted = pd.merge(gwas_summary, temp_df, on="Chr", how="left")
 
-	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["p"]/gwas_adjusted["genomic_inf_by_chr"]
+	fdr_bh_correct = statsmodels.stats.multitest.multipletests(gwas_adjusted["p"], alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
+
+	gwas_adjusted["BH_correction"] = fdr_bh_correct[1]
+
+	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["BH_correction"]/gwas_adjusted["genomic_inf_by_chr"]
 
 	print(color_text("Plotting the data with Manhattam and QQ plots", "yellow"))
 
@@ -684,7 +689,11 @@ if bolt_run:
 
 	gwas_adjusted = pd.merge(gwas_summary, temp_df, on="CHR", how="left")
 
-	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted[p_value_index]/gwas_adjusted["genomic_inf_by_chr"]
+	fdr_bh_correct = statsmodels.stats.multitest.multipletests(gwas_adjusted[p_value_index], alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
+
+	gwas_adjusted["BH_correction"] = fdr_bh_correct[1]
+
+	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["BH_correction"]/gwas_adjusted["genomic_inf_by_chr"]
 
 	print(color_text("Plotting the data with Manhattam and QQ plots", "yellow"))
 
