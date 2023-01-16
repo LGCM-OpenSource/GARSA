@@ -438,7 +438,7 @@ prs_pheno = pd.merge(prs_data, pheno_total, on="IID", how="inner")
 
 #Calculating PRS deciles
 
-prs_pheno["Deciles"] = pd.qcut(prs_pheno["PRS"], 10, lables=False)
+prs_pheno["Deciles"] = pd.qcut(prs_pheno["PRS"], 10, labels=False)
 
 #Saving decile data
 prs_deciles_out = os.path.join(out_dir_path, "PRS_deciles_distribution.tsv")
@@ -465,7 +465,7 @@ print(color_text("Plotting distribution"))
 dist_plot_png = os.path.join(out_dir_path, "PRS_distribution_plot.png")
 dist_plot_svg = os.path.join(out_dir_path, "PRS_distribution_plot.svg")
 
-sns.displot(prs_pheno, x="PRS", kind="kde", fill=True, pallete="pastel")
+sns.displot(prs_pheno, x="PRS", kind="kde", fill=True, palette="pastel")
 
 plt.savefig(dist_plot_png, dpi=300, facecolor="white")
 plt.savefig(dist_plot_svg, facecolor="white")
