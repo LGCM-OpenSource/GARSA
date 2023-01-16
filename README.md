@@ -12,7 +12,7 @@ Dependencies:
     -- sys 
     -- argparse 
     -- textwrap 
-    -- shuti 
+    -- shutil 
     -- time 
     -- gzip 
     -- seaborn 0.11.2
