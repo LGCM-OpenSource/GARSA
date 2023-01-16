@@ -393,7 +393,7 @@ if _try.stderr:
 
 try:
 	_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", in_weight_scores, "1", "2", "3", "header-read", "cols=scoresums", 
-	"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	with open(PRS_err, "w") as err:
 		err.write(_try.stderr)
 	with open(PRS_out, "w") as out:
@@ -428,7 +428,7 @@ covars = pd.read_csv(covar, sep=None, engine="python")
 qcovars = pd.read_csv(qcovar, sep=None, engine="python")
 
 #1 merge
-pheno_total = pd.merge(pheno, covars, on=["FID", "IID"], how="inner")
+pheno_total = pd.merge(pheno_data, covars, on=["FID", "IID"], how="inner")
 #2 merge
 pheno_total = pd.merge(pheno_total, qcovars, on=["FID", "IID"], how="inner")
 
