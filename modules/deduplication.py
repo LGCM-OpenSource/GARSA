@@ -21,9 +21,9 @@ import gzip
 ###############
 
 tty_colors = {
-    'green' : '\033[0;32m%s\033[0m',
-    'yellow' : '\033[0;33m%s\033[0m',
-    'red' : '\033[0;31m%s\033[0m'
+	'green' : '\033[0;32m%s\033[0m',
+	'yellow' : '\033[0;33m%s\033[0m',
+	'red' : '\033[0;31m%s\033[0m'
 }
 
 # # or, example if wanting the ones from before with background highlighting
@@ -36,16 +36,16 @@ tty_colors = {
 
 def color_text(text, color='green'):
 
-    if sys.stdout.isatty():
-        return tty_colors[color] % text
-    else:
-        return text
+	if sys.stdout.isatty():
+		return tty_colors[color] % text
+	else:
+		return text
 
 
 def wprint(text):
 
-    print(textwrap.fill(text, width=80, initial_indent="\n  ", 
-          subsequent_indent="    ", break_on_hyphens=False))
+	print(textwrap.fill(text, width=80, initial_indent="\n  ", 
+		  subsequent_indent="    ", break_on_hyphens=False))
 
 # Identificar se o arquivo de fato existe
 
@@ -74,8 +74,8 @@ arg_parser.add_argument("--threads", help = "Number of computer threads -- defau
 #Se nenhum comando foi dado ao script, automaticamente é mostrado o "help"
 
 if len(sys.argv)==1:
-    arg_parser.print_help(sys.stderr)
-    sys.exit(0)
+	arg_parser.print_help(sys.stderr)
+	sys.exit(0)
 
 
 ##################################
@@ -185,14 +185,14 @@ try:
 	with open(transform_out, "w") as out:
 		out.write(_try.stdout)
 	if _try.stderr:
-		print(color_text("ERROR: Plink2. Check error log file "+multiallele_remove_err, "red"))
+		print(color_text("ERROR: Plink2. Check error log file "+transform_error, "red"))
 		exit(1)
 
 except:
-    print(color_text("Error on Plink2 execution", "red"))
-    print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
-    print(color_text("Error log is stored in "+transform_error, "yellow"))
-    exit(1)
+	print(color_text("Error on Plink2 execution", "red"))
+	print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+	print(color_text("Error log is stored in "+transform_error, "yellow"))
+	exit(1)
 
 #Reading bim
 
@@ -201,6 +201,8 @@ bim_file = pd.read_csv(temp_bim+".bim", sep="\t", header=None, names=["Chr", "rs
 total_snps = len(bim_file["rsID_in"])
 
 desduplicate_bim = bim_file.drop(bim_file[bim_file.duplicated(subset=["Chr", "Position"], keep=False)].index)
+
+desduplicate_bim = desduplicate_bim.drop(desduplicate_bim[desduplicate_bim.duplicated(subset=["rsID_in"], keep=False)].index)
 
 unique_SNPs = desduplicate_bim["rsID_in"].values.tolist()
 
@@ -231,14 +233,14 @@ if len(unique_SNPs) < total_snps:
 			out.write(_try.stdout)
 
 		if _try.stderr:
-			print(color_text("ERROR: Plink2. Check error log file "+multiallele_remove_err, "red"))
+			print(color_text("ERROR: Plink2. Check error log file "+dup_multiallele_err, "red"))
 			exit(1)
 
 	except:
-	    print(color_text("Error on Plink2 execution", "red"))
-	    print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
-	    print(color_text("Error log is stored in "+dup_multiallele_err, "yellow"))
-	    exit(1)
+		print(color_text("Error on Plink2 execution", "red"))
+		print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+		print(color_text("Error log is stored in "+dup_multiallele_err, "yellow"))
+		exit(1)
 
 
 	index_err = os.path.join(temp_files, "index.err")
@@ -251,9 +253,9 @@ if len(unique_SNPs) < total_snps:
 		# 	,stderr=subprocess.PIPE
 		
 	except:
-	    print(color_text("Error on bcftools execution", "red"))
-	    print(color_text("Path used for bcftools executable = "+str(bcftools_path), "red"))
-	    exit(1)
+		print(color_text("Error on bcftools execution", "red"))
+		print(color_text("Path used for bcftools executable = "+str(bcftools_path), "red"))
+		exit(1)
 
 if len(unique_SNPs) == total_snps:
 
@@ -276,10 +278,10 @@ if len(unique_SNPs) == total_snps:
 			exit(1)
 
 	except:
-	    print(color_text("Error on Plink2 execution", "red"))
-	    print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
-	    print(color_text("Error log is stored in "+multiallele_remove_err, "yellow"))
-	    exit(1)
+		print(color_text("Error on Plink2 execution", "red"))
+		print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+		print(color_text("Error log is stored in "+multiallele_remove_err, "yellow"))
+		exit(1)
 
 	index_err = os.path.join(temp_files, "index.err")
 	index_out = os.path.join(temp_files, "index.out")
@@ -290,9 +292,9 @@ if len(unique_SNPs) == total_snps:
 		# 	err.write(_try.stderr)
 		# 	 stderr=subprocess.PIPE,
 	except:
-	    print(color_text("Error on bcftools execution", "red"))
-	    print(color_text("Path used for bcftools executable = "+str(bcftools_path), "red"))
-	    exit(1)
+		print(color_text("Error on bcftools execution", "red"))
+		print(color_text("Path used for bcftools executable = "+str(bcftools_path), "red"))
+		exit(1)
 
 	multi_var_end = time.time()
 

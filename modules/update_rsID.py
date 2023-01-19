@@ -218,16 +218,19 @@ temp_filetered_vcf_file = os.path.join(temp_files, "filtered_temp_ref.vcf.gz")
 
 print(color_text("Filtering snps from database"))
 
+if os.path.exists(temp_filtered_file) and os.path.exists(temp_filetered_vcf_file):
+	print("database files already created")
+else:
+	output_vcf_to_filter = os.path.join(temp_files, "database_rsids_filter.txt")
+	subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filtered_file, "--no-header", "--threads", threads])
 
-subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filtered_file, "--no-header", "--threads", threads])
+	print(color_text("Table creation done"))
 
-print(color_text("Table creation done"))
+	subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filtered_file, "--threads", threads])
 
-subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filetered_vcf_file, "--threads", threads])
+	subprocess.run([bcftools_path, "index", "-f","-t", temp_filetered_vcf_file, "--threads", threads])
 
-subprocess.run([bcftools_path, "index", "-t", temp_filetered_vcf_file, "--threads", threads])
-
-print(color_text("databse VCF creation done"))
+	print(color_text("databse VCF creation done"))
 
 #2 Transform user input to bim file
 
@@ -265,7 +268,7 @@ user_bim = pd.read_csv(temp_user_bim+".bim", sep="\t", header=None, names=["Chr"
 
 ref_vcf = pd.read_csv(temp_filtered_file, sep="\t", header=None, names=["Chr", "Position", "rsID", "REF", "ALT", "coisa", "coisa1", "INFO"], dtype="str")
 ref_vcf_explode = ref_vcf.assign(ALT=ref_vcf["ALT"].str.split(",")).explode("ALT")
-ref_vcf_explode
+# ref_vcf_explode
 
 #Merge both datasets for analysis
 
@@ -354,6 +357,10 @@ if flipped_count != 0:
 
 
 else:
+	flipped_out = os.path.join(temp_files, base_name+"_flipped")
+
+	flip_err = os.path.join(temp_files, "flipped_snps.err")
+	flip_out = os.path.join(temp_files, "flipped_snps.out")
 	print(color_text("No flipped SNPs found, skipping correction"))
 	try:
 		_try = subprocess.run([plink2_path, "--bfile", swapped_out,"--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
@@ -401,7 +408,7 @@ annotation_start = time.time()
 print(color_text("Starting annotation"))
 annot_output_file = file_name.replace(".vcf.gz", ".RSIDs.vcf.gz")
 annot_output = os.path.join(out_dir_path,annot_output_file)
-subprocess.run([bcftools_path,"annotate","--threads",threads,"-a",temp_filetered_vcf_file, "-c","CHROM,POS,ID", "-Oz","-o",annot_output,flipped_out+".vcf.gz"])
+subprocess.run([bcftools_path,"annotate","--threads",threads,"-a",temp_filetered_vcf_file, "-c","ID", "-Oz","-o",annot_output,flipped_out+".vcf.gz"])
 
 print(color_text("Indexing compressed file"))
 subprocess.run([bcftools_path,"index","-f","--threads",threads,"-t",annot_output])
