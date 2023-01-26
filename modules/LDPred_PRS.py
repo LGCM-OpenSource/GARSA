@@ -271,10 +271,11 @@ n_of_indiv = len(fam_file[0])
 
 
 if bolt == True:
+	p_value_column = mlma_to_adjust.columns[-1]
 	try:
 		adjusted = mlma_to_adjust.drop(columns=["A1FREQ", "GENPOS", "F_MISS"])
 		adjusted = adjusted.rename(columns={"CHR": "chr", "SNP" : "rsid", "BP" : "pos", "ALLELE0" : "a0", "ALLELE1" : "a1", "BETA": "beta",
-	"SE" : "beta_se"})
+	"SE" : "beta_se",p_value_column: "p"})
 	except:
 		print(color_text("ERROR: Wrong columns names in input file "+str(mlma), "red"))
 		exit(1)
