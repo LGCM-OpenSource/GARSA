@@ -162,7 +162,7 @@ except:
 	print(color_text("tmp folder exists, will keep using it"))
 
 
-print(color_text("Using "+threads+" threads"))
+print(color_text("Using "+str(threads)+" threads"))
 
 
 #Verificando se os arquivos de database existem!

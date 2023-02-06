@@ -189,7 +189,7 @@ y <- pheno[match(fam.order[,1],pheno[,1]),]
 sex_column <- names(covariate[3])
 
 null.model <- paste("PC", 1:n_pcs, sep = "", collapse = "+") %>%
-  paste0("Pheno~",sex_column, "+", .) %>%
+  paste0("Pheno~PRS",sex_column, "+", .) %>%
   as.formula %>%
   lm(., data = y) %>%
   summary
