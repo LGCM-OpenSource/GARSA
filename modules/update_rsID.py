@@ -226,7 +226,7 @@ else:
 
 	print(color_text("Table creation done"))
 
-	subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filtered_file, "--threads", threads])
+	subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filetered_vcf_file, "--threads", threads])
 
 	subprocess.run([bcftools_path, "index", "-f","-t", temp_filetered_vcf_file, "--threads", threads])
 
@@ -335,7 +335,7 @@ if flipped_count != 0:
 	flip_out = os.path.join(temp_files, "flipped_snps.out")
 
 	to_flip = intersect_data[intersect_data["flipped"] == "TRUE"]
-	to_flip = to_flip[["rsID_in"]]
+	to_flip = to_flip[["rsID_in"]].drop_duplicates(keep="first")
 	to_flip.to_csv(flip_file, sep="\t", index=False, header=False)
 
 	#Corrgir usando plink
