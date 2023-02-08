@@ -156,7 +156,8 @@ if command == "kinship":
 
 if command == "PCA":
 	script_to_run = os.path.join(script_path,"PCA_analysis.py")
-	arguments = ["python3",script_to_run] + ["--garsa_path",primary_script_path] + args[1:]
+	# arguments = ["python3",script_to_run] + ["--garsa_path",primary_script_path] + args[1:]
+	arguments = ["python3",script_to_run] + args[1:]
 	# 
 	subprocess.run(arguments)
 

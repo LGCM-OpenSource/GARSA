@@ -21,6 +21,7 @@ from numpy import genfromtxt
 from assocplots.qqplot import * #0.0.2
 import statsmodels
 import warnings
+import re
 
 ###############
 ## Functions ##
@@ -199,6 +200,30 @@ if covar:
 if qcovar:
 	qcovar = os.path.abspath(qcovar)
 pheno = os.path.abspath(pheno)
+
+
+## Check grm.id format ##
+
+print(color_text("Checking GRM id format", "yellow"))
+
+to_match = re.compile('.*\t.*_.*')
+if kinship:
+	grm_id = kinship+".grm.id"
+	#Open the file and check the format
+	with open(grm_id, "r") as kfile:
+		new_id =[]
+		for i in kfile:
+			# print(i)
+			if to_match.match(i) is not None:
+				splitted = i.split()
+				ids = splitted[1].split("_")
+				new_id.append(ids)
+	if new_id:			
+		print(color_text("Writing adjusted grm id"))
+
+		with open(grm_id, "w") as kfile:
+			for i in new_id:
+				kfile.write(i[0]+"\t"+i[1]+"\n")
 
 #######################
 ## Starting analysis ##

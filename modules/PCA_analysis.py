@@ -72,7 +72,7 @@ arg_parser.add_argument("--sliding_window_step", help = "Sliding Window step -- 
 arg_parser.add_argument("--prune_r2", help = "R2 value for prunning-- default = 0.03", default="0.03")
 # arg_parser.add_argument("--N_pop", help = "Number of expected populations in sample, if provided no testing for best K is performed -- The default is for automatic look up using admixture")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
-arg_parser.add_argument("--garsa_path", help = "Path to main script GARSA -- always provided by default")
+# arg_parser.add_argument("--garsa_path", help = "Path to main script GARSA -- always provided by default")
 
 
 #Se nenhum comando foi dado ao script, automaticamente é mostrado o "help"
@@ -117,10 +117,9 @@ step_size = args_dict["sliding_window_step"]
 prune_r2 = args_dict["prune_r2"]
 threads = args_dict["threads"]
 output_folder = args_dict["output_folder"]
-GARSA_path = args_dict["garsa_path"]
+# GARSA_path = args_dict["garsa_path"]
+GARSA_path = os.getcwd()
 # N_pop = args_dict["N_pop"]
-
-
 
 #######################
 ## Pre-flight checks ##
@@ -570,6 +569,7 @@ best_results = list_results[0]
 print(color_text("Best number of K populations found is "+str(best_results[0])+" with CV error = "+str(best_results[1])))
 
 #admixture files are always outputed on the script path! 
+print("Moving files")
 admix_output = GARSA_path
 
 for file in os.listdir(admix_output):
