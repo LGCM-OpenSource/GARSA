@@ -82,6 +82,7 @@ arg_parser.add_argument("-kinship", "--kinship_grm", help = "Path for the kinshi
 arg_parser.add_argument("--make_king", help = "Make the kinship analysis (no correction by admixture", action="store_true")
 arg_parser.add_argument("-o", "--output_folder", help = "Wanted output folder (default: current output folder)")
 arg_parser.add_argument("-gcta", "--gcta_run", help = "Select gcta analysis for GWAS -- recomended for N sample < 5000", action="store_true")
+arg_parser.add_argument("--bh_correction", help = "Select the p-value correction by Benjamini-Hochberg. Used for big populations (> 100.000) -- Use this flag to select to use BH correction, the default is to correct by Genomic Inflation", action="store_true")
 arg_parser.add_argument("-BoltLmm", "--BoltLmm_run", help = "Select Bolt-lmm for GWAS -- recomended for N samples > 5000", action="store_true")
 arg_parser.add_argument("-BoltLD", "--BoltLD_file", help = "Path for the Bolt-lmm LD file -- default: File provided by the BOLT-LMM distribution")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
@@ -130,6 +131,7 @@ make_king = args_dict["make_king"]
 bolt_path = os.path.join(script_path, "BOLT-LMM_v2.4")
 bolt_run = args_dict["BoltLmm_run"]
 bolt_ld = args_dict["BoltLD_file"]
+bh_correction = args_dict["bh_correction"]
 
 #######################
 ## Pre-flight checks ##
@@ -269,335 +271,356 @@ if vcf_file: #Se foi dado amboms VCF e path do plink o programa executa o plink 
 
 	exec_times.append(["Plink convertion step", plink_convertion_time])
 
+gwas_start = time.time()
+
 ## Rodando GCTA
-if gcta_run == True:
+gwas_output_check = out_dir_path
 
-	if not os.path.exists(gcta_path):
-		print(color_text("WARNING: executable for gcta not found in "+str(script_path), "yellow"))
+if not True in [c.endswith(".mlma") for c in os.listdir(gwas_output_check)]:
 
-#GCTA kinship para o usuário que achar necessário -- O input aqui vai ser o bfile, seja o gerado pelo plink ou dado pelo usuário
+	if gcta_run == True:
 
-	if make_king == True:
+		if not os.path.exists(gcta_path):
+			print(color_text("WARNING: executable for gcta not found in "+str(script_path), "yellow"))
 
-		gcta_kinship_start = time.time()
+	#GCTA kinship para o usuário que achar necessário -- O input aqui vai ser o bfile, seja o gerado pelo plink ou dado pelo usuário
 
-		print(color_text("Startin Kinship analysis using GCTA", "yellow"))
+		if make_king == True:
 
-		gcta_king_out = os.path.join(out_dir_path, base_name+"_GCTA_kinship")
+			gcta_kinship_start = time.time()
 
-		gcta_king_err = os.path.join(temp_files, "GCTA_Kinship.err")
-		gcta_king_out = os.path.join(temp_files, "GCTA_Kinship.out")
+			print(color_text("Startin Kinship analysis using GCTA", "yellow"))
 
-		try:
-			_try = subprocess.run([gcta_path, "--bfile", bfile,"--make-grm", "--out", gcta_king_out, "--thread-num", threads], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-				text=True)
-			with open(gcta_king_err, "w") as err:
-				err.write(_try.stderr)
-			with open(gcta_king_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: GCTA. Check error file "+str(gcta_king_err), "yellow"))
-		except:
-			print(color_text("ERROR on GCTA", "red"))
-			print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
-			exit(1)
+			gcta_king_out = os.path.join(out_dir_path, base_name+"_GCTA_kinship")
 
-		kinship = gcta_king_out
+			gcta_king_err = os.path.join(temp_files, "GCTA_Kinship.err")
+			gcta_king_out = os.path.join(temp_files, "GCTA_Kinship.out")
 
-		gcta_kinship_end = time.time()
+			try:
+				_try = subprocess.run([gcta_path, "--bfile", bfile,"--make-grm", "--out", gcta_king_out, "--thread-num", threads], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+					text=True)
+				with open(gcta_king_err, "w") as err:
+					err.write(_try.stderr)
+				with open(gcta_king_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: GCTA. Check error file "+str(gcta_king_err), "yellow"))
+			except:
+				print(color_text("ERROR on GCTA", "red"))
+				print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
+				exit(1)
 
-		gcta_kinship_time = (gcta_kinship_end - gcta_kinship_start)
+			kinship = gcta_king_out
 
-		exec_times.append(["Kinship_GCTA", gcta_kinship_time])
+			gcta_kinship_end = time.time()
 
-	#Após organizar tudo, precisamos dos binários (fornecidos ou gerados), kinship (fornecido, do nosso script em R ou gerado aqui), dos fenótipos dados pelo usuário e das covariaveis também dado pelo usuário
-	gwas_start = time.time()
-	print(color_text("Starting the GWAS regression using Linear Mixed Model (LMM)", "yellow"))
+			gcta_kinship_time = (gcta_kinship_end - gcta_kinship_start)
 
-	if args_dict["quantitative_covar"] is not None and args_dict["covar"] is not None: #Se foi fornecido ambos covar e qcovar
+			exec_times.append(["Kinship_GCTA", gcta_kinship_time])
+
+		#Após organizar tudo, precisamos dos binários (fornecidos ou gerados), kinship (fornecido, do nosso script em R ou gerado aqui), dos fenótipos dados pelo usuário e das covariaveis também dado pelo usuário
+		gwas_start = time.time()
+		print(color_text("Starting the GWAS regression using Linear Mixed Model (LMM)", "yellow"))
+
+		if args_dict["quantitative_covar"] is not None and args_dict["covar"] is not None: #Se foi fornecido ambos covar e qcovar
+			
+			print(color_text("Using covar and qcovar for regression", "yellow"))
+
+			gwas_out = os.path.join(out_dir_path, base_name+"_qcovar_covar_GWAS")
+			gcta_qcov_cov_err = os.path.join(temp_files, "gcta_qcov_cov.err")
+			gcta_qcov_cov_out = os.path.join(temp_files, "gcta_qcov_cov.out")
+
+			try:
+				_try = subprocess.run([gcta_path, "--mlma", "--bfile", bfile, "--pheno", pheno, "--qcovar", qcovar, "--covar", covar, "--grm", kinship, "--out", gwas_out,"--thread-num", threads],
+					stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+				with open(gcta_qcov_cov_err, "w") as err:
+					err.write(_try.stderr)
+				with open(gcta_qcov_cov_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: GCTA. Check error file "+str(gcta_qcov_cov_err), "yellow"))
+			except:
+				print(color_text("ERROR on GCTA", "red"))
+				print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
+				exit(1)
+
+		if args_dict["quantitative_covar"] is None and args_dict["covar"] is not None: #Fornecendo apenas o arquivo covar
+
+			print(color_text("Using only covar for regression", "yellow"))
+
+			gwas_out = os.path.join(out_dir_path, base_name+"_covar_GWAS")
+			gcta_cov_err = os.path.join(temp_files, "gcta_cov.err")
+			gcta_cov_out = os.path.join(temp_files, "gcta_cov.out")
+
+			try:
+				_try = subprocess.run([gcta_path, "--mlma", "--bfile", bfile, "--pheno", pheno, "--covar", covar, "--grm", kinship, "--out", gwas_out,"--thread-num", threads],
+					stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+				with open(gcta_cov_err, "w") as err:
+					err.write(_try.stderr)
+				with open(gcta_cov_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: GCTA. Check error file "+str(gcta_cov_err), "yellow"))
+			except:
+				print(color_text("ERROR on GCTA", "red"))
+				print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
+				exit(1)
+
+
+		if args_dict["quantitative_covar"] is not None and args_dict["covar"] is None:#Fornecendo apenas o arquivo qcovar
+
+			print(color_text("Using only qcovar for regresion", "yellow"))
+			gwas_out = os.path.join(out_dir_path, base_name+"_qcovar_GWAS")
+			gcta_qcov_err = os.path.join(temp_files, "gcta_qov.err")
+			gcta_qcov_out = os.path.join(temp_files, "gcta_qov.out")
+
+			try:
+				_try = subprocess.run([gcta_path, "--mlma", "--bfile", bfile, "--pheno", pheno, "--qcovar", qcovar, "--grm", kinship, "--out", gwas_out,"--thread-num", threads],
+					stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+				with open(gcta_qcov_err, "w") as err:
+					err.write(_try.stderr)
+				with open(gcta_qcov_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: GCTA. Check error file "+str(gcta_qcov_err), "yellow"))
+			except:
+				print(color_text("ERROR on GCTA", "red"))
+				print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
+				exit(1)
+else:
+	for i in os.listdir(gwas_output_check):
+		if i.endswith(".mlma"):
+			gwas_out = i.replace(".mlma", "")
+	# print(gwas_out)
+	print(color_text("File STATS or MLMA present in output folder. Skipping GWAS run."))
+
+
+if not True in [c.endswith(".stats") for c in os.listdir(gwas_output_check)]:
+
+	if bolt_run == True:
+		exec_bolt = os.path.join(bolt_path, "bolt")
+		if not os.path.exists(exec_bolt):
+			print(color_text("WARNING: executable for bolt-lmm not found in "+str(script_path), "yellow"))
+
+		total_n_of_SNPS = len(genfromtxt(bfile+".bim", delimiter=' '))
+
+		gwas_start = time.time()
+		print(color_text("Starting the BOLT GWAS regression using Linear Mixed Model (LMM)", "yellow"))
+
+		if args_dict["quantitative_covar"] is not None and args_dict["covar"] is not None: #Se foi fornecido ambos covar e qcovar
+			
+			print(color_text("Using covar and qcovar for regression", "yellow"))
+
+			bolt_covars = os.path.join(temp_files, "bolt_covars.tsv")
+
+			gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_qcovar_covar_GWAS")
+
+
+			#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
+
+			get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
+
+			pheno_col = get_pheno_col.columns.tolist()[-1]
+
+			
+			## Agora podemos seguir em frente e a partir dos arquivos fornecidos gerar o restante dos comandos
+
+			get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
+
+			covar_cols = get_covars_cols.columns.tolist()
+
+			get_covars_cols.rename(columns={covar_cols[0]: "FID", covar_cols[1]: "IID"}, inplace=True)
+
+			covars_data = get_covars_cols.columns.tolist()[2:]
+
+			covars_command = ["--covarCol="+str(x) for x in covars_data] #Lista de comandos para covars pronto!
+
+			## Por fim pegamos os qcovars
+
+			get_qcovars_cols = pd.read_csv(qcovar, dtype="str",sep=None, engine="python")
+
+			qcovars_data = get_qcovars_cols.columns.tolist()[2:]
+
+			qcovars_command = ["--qCovarCol="+str(x) for x in qcovars_data]
+
+			bolt_covars_df = pd.merge(get_covars_cols, get_qcovars_cols, on=["FID", "IID"], how="left")
+
+			bolt_covars_df.to_csv(bolt_covars, index=False, sep="\t")
+
+			## Como a quantidade de valores de covar e qcovars pode ser variavel faremos primeiro uma lista com todos os valores que são fixos
+			## bfile, phenoFile, phenoCol e covarFile precisam estar presentes -- Lembrando que o fenótipo é apenas 1 e permite que fique "Fixo" no código
+
+			start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+			"--covarUseMissingIndic",
+			"--LDscoresFile="+str(bolt_ld),"--lmm",
+			"--phenoFile="+str(pheno), 
+			"--phenoCol="+str(pheno_col),
+			"--covarFile="+str(bolt_covars)]
+
+			## Agora vamos gerar a lista com os comandos finais
+
+			final_commands = start_command + covars_command + qcovars_command
+			total_linhas = len(final_commands)
+
+			bolt_script = os.path.join(temp_files, "run_bolt.sh")
+			with open(bolt_script, "w") as f:
+				count=1
+				f.write("#!/bin/bash"+"\n")
+				f.write(f"cd {bolt_path}"+"\n")
+				for i in final_commands:
+					if count == 1:
+						f.write(i+" \\"+"\n")
+						count+=1
+					elif count == total_linhas:
+						f.write("\t"+i)
+					else:
+						f.write("\t"+i+" \\"+"\n")
+						count+=1
+					
+
+			bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
+			bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
+
+			try:
+				_try = subprocess.run(["bash", bolt_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+				with open(bolt_qvocar_covar_err, "w") as err:
+					err.write(_try.stderr)
+				with open(bolt_qvocar_covar_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: BOLT-LMM. Check error file "+str(bolt_qvocar_covar_err), "yellow"))
+			except:
+				print(color_text("ERROR on BOLT-LMM execution", "red"))
+				print(color_text("For more details check the "+str(bolt_qvocar_covar_err)+" file", "yellow"))
+
+
+		if args_dict["quantitative_covar"] is None and args_dict["covar"] is not None: #Fornecendo apenas o arquivo covar
+
+			print(color_text("Using only covar for regression", "yellow"))
+
+			gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_covar_GWAS")
+
+			#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
+
+			get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
+
+			pheno_col = get_pheno_col.columns.tolist()[-1]
+
+			start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+			"--covarUseMissingIndic",
+			"--LDscoresFile="+str(bolt_ld),"--lmm",
+			"--phenoFile="+str(pheno), 
+			"--phenoCol="+str(pheno_col),
+			"--covarFile="+str(covar)]
+
+			## Nesse caso, foi fornecido apenas o arquivo de covars
+
+			get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
+
+			covars_data = get_covars_cols.columns.tolist()[2:]
+
+			covars_command = ["--covarCol="+str(x) for x in covars_data] #Lista de comandos para covars pronto!
 		
-		print(color_text("Using covar and qcovar for regression", "yellow"))
 
-		gwas_out = os.path.join(out_dir_path, base_name+"_GCTA_qcovar_covar_GWAS")
-		gcta_qcov_cov_err = os.path.join(temp_files, "gcta_qcov_cov.err")
-		gcta_qcov_cov_out = os.path.join(temp_files, "gcta_qcov_cov.out")
-
-		try:
-			_try = subprocess.run([gcta_path, "--mlma", "--bfile", bfile, "--pheno", pheno, "--qcovar", qcovar, "--covar", covar, "--grm", kinship, "--out", gwas_out,"--thread-num", threads],
-				stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-			with open(gcta_qcov_cov_err, "w") as err:
-				err.write(_try.stderr)
-			with open(gcta_qcov_cov_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: GCTA. Check error file "+str(gcta_qcov_cov_err), "yellow"))
-		except:
-			print(color_text("ERROR on GCTA", "red"))
-			print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
-			exit(1)
-
-	if args_dict["quantitative_covar"] is None and args_dict["covar"] is not None: #Fornecendo apenas o arquivo covar
-
-		print(color_text("Using only covar for regression", "yellow"))
-
-		gwas_out = os.path.join(out_dir_path, base_name+"_covar_GWAS")
-		gcta_cov_err = os.path.join(temp_files, "gcta_cov.err")
-		gcta_cov_out = os.path.join(temp_files, "gcta_cov.out")
-
-		try:
-			_try = subprocess.run([gcta_path, "--mlma", "--bfile", bfile, "--pheno", pheno, "--covar", covar, "--grm", kinship, "--out", gwas_out,"--thread-num", threads],
-				stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-			with open(gcta_cov_err, "w") as err:
-				err.write(_try.stderr)
-			with open(gcta_cov_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: GCTA. Check error file "+str(gcta_cov_err), "yellow"))
-		except:
-			print(color_text("ERROR on GCTA", "red"))
-			print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
-			exit(1)
-
-
-	if args_dict["quantitative_covar"] is not None and args_dict["covar"] is None:#Fornecendo apenas o arquivo qcovar
-
-		print(color_text("Using only qcovar for regresion", "yellow"))
-		gwas_out = os.path.join(out_dir_path, base_name+"_qcovar_GWAS")
-		gcta_qcov_err = os.path.join(temp_files, "gcta_qov.err")
-		gcta_qcov_out = os.path.join(temp_files, "gcta_qov.out")
-
-		try:
-			_try = subprocess.run([gcta_path, "--mlma", "--bfile", bfile, "--pheno", pheno, "--qcovar", qcovar, "--grm", kinship, "--out", gwas_out,"--thread-num", threads],
-				stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-			with open(gcta_qcov_err, "w") as err:
-				err.write(_try.stderr)
-			with oepn(gcta_qcov_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: GCTA. Check error file "+str(gcta_qcov_err), "yellow"))
-		except:
-			print(color_text("ERROR on GCTA", "red"))
-			print(color_text("Check error log on "+str(gcta_king_err), "yellow"))
-			exit(1)
-
-if bolt_run == True:
-	exec_bolt = os.path.join(bolt_path, "bolt")
-	if not os.path.exists(exec_bolt):
-		print(color_text("WARNING: executable for bolt-lmm not found in "+str(script_path), "yellow"))
-
-	total_n_of_SNPS = len(genfromtxt(bfile+".bim", delimiter=' '))
-
-	gwas_start = time.time()
-	print(color_text("Starting the BOLT GWAS regression using Linear Mixed Model (LMM)", "yellow"))
-
-	if args_dict["quantitative_covar"] is not None and args_dict["covar"] is not None: #Se foi fornecido ambos covar e qcovar
-		
-		print(color_text("Using covar and qcovar for regression", "yellow"))
-
-		bolt_covars = os.path.join(temp_files, "bolt_covars.tsv")
-
-		gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_qcovar_covar_GWAS")
-
-
-		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
-
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
-
-		pheno_col = get_pheno_col.columns.tolist()[-1]
-
-		
-		## Agora podemos seguir em frente e a partir dos arquivos fornecidos gerar o restante dos comandos
-
-		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
-
-		covar_cols = get_covars_cols.columns.tolist()
-
-		get_covars_cols.rename(columns={covar_cols[0]: "FID", covar_cols[1]: "IID"}, inplace=True)
-
-		covars_data = get_covars_cols.columns.tolist()[2:]
-
-		covars_command = ["--covarCol="+str(x) for x in covars_data] #Lista de comandos para covars pronto!
-
-		## Por fim pegamos os qcovars
-
-		get_qcovars_cols = pd.read_csv(qcovar, dtype="str",sep=None, engine="python")
-
-		qcovars_data = get_qcovars_cols.columns.tolist()[2:]
-
-		qcovars_command = ["--qCovarCol="+str(x) for x in qcovars_data]
-
-		bolt_covars_df = pd.merge(get_covars_cols, get_qcovars_cols, on=["FID", "IID"], how="left")
-
-		bolt_covars_df.to_csv(bolt_covars, index=False, sep="\t")
-
-		## Como a quantidade de valores de covar e qcovars pode ser variavel faremos primeiro uma lista com todos os valores que são fixos
-		## bfile, phenoFile, phenoCol e covarFile precisam estar presentes -- Lembrando que o fenótipo é apenas 1 e permite que fique "Fixo" no código
-
-		start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
-		"--covarUseMissingIndic",
-		"--LDscoresFile="+str(bolt_ld),"--lmm",
-		"--phenoFile="+str(pheno), 
-		"--phenoCol="+str(pheno_col),
-		"--covarFile="+str(bolt_covars)]
-
-		## Agora vamos gerar a lista com os comandos finais
-
-		final_commands = start_command + covars_command + qcovars_command
-		total_linhas = len(final_commands)
-
-		bolt_script = os.path.join(temp_files, "run_bolt.sh")
-		with open(bolt_script, "w") as f:
-			count=1
-			f.write("#!/bin/bash"+"\n")
-			f.write(f"cd {bolt_path}"+"\n")
-			for i in final_commands:
-				if count == 1:
-					f.write(i+" \\"+"\n")
-					count+=1
-				elif count == total_linhas:
-					f.write("\t"+i)
-				else:
-					f.write("\t"+i+" \\"+"\n")
-					count+=1
-				
-
-		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
-		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
-
-		try:
-			_try = subprocess.run(["bash", bolt_script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-			with open(bolt_qvocar_covar_err, "w") as err:
-				err.write(_try.stderr)
-			with open(bolt_qvocar_covar_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: BOLT-LMM. Check error file "+str(bolt_qvocar_covar_err), "yellow"))
-		except:
-			print(color_text("ERROR on BOLT-LMM execution", "red"))
-			print(color_text("For more details check the "+str(bolt_qvocar_covar_err)+" file", "yellow"))
-
-
-	if args_dict["quantitative_covar"] is None and args_dict["covar"] is not None: #Fornecendo apenas o arquivo covar
-
-		print(color_text("Using only covar for regression", "yellow"))
-
-		gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_covar_GWAS")
-
-		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
-
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
-
-		pheno_col = get_pheno_col.columns.tolist()[-1]
-
-		start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
-		"--covarUseMissingIndic",
-		"--LDscoresFile="+str(bolt_ld),"--lmm",
-		"--phenoFile="+str(pheno), 
-		"--phenoCol="+str(pheno_col),
-		"--covarFile="+str(covar)]
-
-		## Nesse caso, foi fornecido apenas o arquivo de covars
-
-		get_covars_cols = pd.read_csv(covar, dtype="str",sep=None, engine="python")
-
-		covars_data = get_covars_cols.columns.tolist()[2:]
-
-		covars_command = ["--covarCol="+str(x) for x in covars_data] #Lista de comandos para covars pronto!
-	
-
-		final_commands = start_command + covars_command
-		total_linhas = len(final_commands)
-
-		bolt_script = os.path.join(temp_files, "run_bolt.sh")
-		with open(bolt_script, "w") as f:
-			count=1
-			f.write("#!/bin/bash"+"\n")
-			f.write(f"cd {bolt_path}"+"\n")
-			for i in final_commands:
-				if count == 1:
-					f.write(i+" \\"+"\n")
-					count+=1
-				elif count == total_linhas:
-					f.write("\t"+i)
-				else:
-					f.write("\t"+i+" \\"+"\n")
-					count+=1
-
-		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
-		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
-
-		try:
-			_try = subprocess.run(final_commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-			with open(bolt_qvocar_covar_err, "w") as err:
-				err.write(_try.stderr)
-			with open(bolt_qvocar_covar_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: BOLT-LMM. Check error file "+str(bolt_qvocar_covar_err), "yellow"))
-		except:
-			print(color_text("ERROR on BOLT-LMM execution", "red"))
-			print(color_text("For more details check the "+str(bolt_qvocar_covar_err)+" file", "yellow"))
-
-	if args_dict["quantitative_covar"] is not None and args_dict["covar"] is None:#Fornecendo apenas o arquivo qcovar
-
-		print(color_text("Using only qcovar for regresion", "yellow"))
-
-		gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_qcovar_GWAS")
-
-
-		#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
-
-		get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
-
-		pheno_col = get_pheno_col.columns.tolist()[-1]
-
-		start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
-		"--covarUseMissingIndic",
-		"--LDscoresFile="+str(bolt_ld),"--lmm",
-		"--phenoFile="+str(pheno), 
-		"--phenoCol="+str(pheno_col),
-		"--covarFile="+str(qcovar)]
-
-		## Nesse caso, foi fornecido apenas o arquivo de qcovars
-
-		get_qcovars_cols = pd.read_csv(qcovar, dtype="str",sep=None, engine="python")
-
-		qcovars_data = get_qcovars_cols.columns.tolist()[2:]
-
-		qcovars_command = ["--qCovarCol="+str(x) for x in qcovars_data]
-
-		final_commands = start_command + qcovars_command
-		total_linhas = len(final_commands)
-
-		bolt_script = os.path.join(temp_files, "run_bolt.sh")
-		with open(bolt_script, "w") as f:
-			count=1
-			f.write("#!/bin/bash"+"\n")
-			f.write(f"cd {bolt_path}"+"\n")
-			for i in final_commands:
-				if count == 1:
-					f.write(i+" \\"+"\n")
-					count+=1
-				elif count == total_linhas:
-					f.write("\t"+i)
-				else:
-					f.write("\t"+i+" \\"+"\n")
-					count+=1
-
-		bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
-		bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
-
-		try:
-			_try = subprocess.run(final_commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-			with open(bolt_qvocar_covar_err, "w") as err:
-				err.write(_try.stderr)
-			with open(bolt_qvocar_covar_out, "w") as out:
-				out.write(_try.stdout)
-			if _try.stderr:
-				print(color_text("WARNING: BOLT-LMM. Check error file "+str(bolt_qvocar_covar_err), "yellow"))
-		except:
-			print(color_text("ERROR on BOLT-LMM execution", "red"))
-			print(color_text("For more details check the "+str(bolt_qvocar_covar_err)+" file", "yellow"))
+			final_commands = start_command + covars_command
+			total_linhas = len(final_commands)
+
+			bolt_script = os.path.join(temp_files, "run_bolt.sh")
+			with open(bolt_script, "w") as f:
+				count=1
+				f.write("#!/bin/bash"+"\n")
+				f.write(f"cd {bolt_path}"+"\n")
+				for i in final_commands:
+					if count == 1:
+						f.write(i+" \\"+"\n")
+						count+=1
+					elif count == total_linhas:
+						f.write("\t"+i)
+					else:
+						f.write("\t"+i+" \\"+"\n")
+						count+=1
+
+			bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
+			bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
+
+			try:
+				_try = subprocess.run(final_commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+				with open(bolt_qvocar_covar_err, "w") as err:
+					err.write(_try.stderr)
+				with open(bolt_qvocar_covar_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: BOLT-LMM. Check error file "+str(bolt_qvocar_covar_err), "yellow"))
+			except:
+				print(color_text("ERROR on BOLT-LMM execution", "red"))
+				print(color_text("For more details check the "+str(bolt_qvocar_covar_err)+" file", "yellow"))
+
+		if args_dict["quantitative_covar"] is not None and args_dict["covar"] is None:#Fornecendo apenas o arquivo qcovar
+
+			print(color_text("Using only qcovar for regresion", "yellow"))
+
+			gwas_out = os.path.join(out_dir_path, base_name+"_BOLT_qcovar_GWAS")
+
+
+			#Os arquivos de fenótipo contém 3 colunas -- FID IID e PHENO
+
+			get_pheno_col = pd.read_csv(pheno, dtype="str",sep=None, engine="python")
+
+			pheno_col = get_pheno_col.columns.tolist()[-1]
+
+			start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
+			"--covarUseMissingIndic",
+			"--LDscoresFile="+str(bolt_ld),"--lmm",
+			"--phenoFile="+str(pheno), 
+			"--phenoCol="+str(pheno_col),
+			"--covarFile="+str(qcovar)]
+
+			## Nesse caso, foi fornecido apenas o arquivo de qcovars
+
+			get_qcovars_cols = pd.read_csv(qcovar, dtype="str",sep=None, engine="python")
+
+			qcovars_data = get_qcovars_cols.columns.tolist()[2:]
+
+			qcovars_command = ["--qCovarCol="+str(x) for x in qcovars_data]
+
+			final_commands = start_command + qcovars_command
+			total_linhas = len(final_commands)
+
+			bolt_script = os.path.join(temp_files, "run_bolt.sh")
+			with open(bolt_script, "w") as f:
+				count=1
+				f.write("#!/bin/bash"+"\n")
+				f.write(f"cd {bolt_path}"+"\n")
+				for i in final_commands:
+					if count == 1:
+						f.write(i+" \\"+"\n")
+						count+=1
+					elif count == total_linhas:
+						f.write("\t"+i)
+					else:
+						f.write("\t"+i+" \\"+"\n")
+						count+=1
+
+			bolt_qvocar_covar_err = os.path.join(temp_files, "bolt_qvocar_covar.err")
+			bolt_qvocar_covar_out = os.path.join(temp_files, "bolt_qvocar_covar.out")
+
+			try:
+				_try = subprocess.run(final_commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+				with open(bolt_qvocar_covar_err, "w") as err:
+					err.write(_try.stderr)
+				with open(bolt_qvocar_covar_out, "w") as out:
+					out.write(_try.stdout)
+				if _try.stderr:
+					print(color_text("WARNING: BOLT-LMM. Check error file "+str(bolt_qvocar_covar_err), "yellow"))
+			except:
+				print(color_text("ERROR on BOLT-LMM execution", "red"))
+				print(color_text("For more details check the "+str(bolt_qvocar_covar_err)+" file", "yellow"))
+
+else:
+	for i in os.listdir(gwas_output_check):
+		if i.endswith(".stats"):
+			gwas_out = i.replace(".stats", "")
+	print(color_text("File STATS or MLMA present in output folder. Skipping GWAS run."))
 
 gwas_end = time.time()
 
@@ -607,6 +630,8 @@ exec_times.append(["GWAS regression", gwas_time])
 
 
 #Agora vamos corrigir os pvalues usando https://doi.org/10.1111/jbg.12419 como referencia para os calculos
+
+import statsmodels.stats.multitest as sm
 
 if gcta_run:
 
@@ -646,11 +671,16 @@ if gcta_run:
 
 	gwas_adjusted = pd.merge(gwas_summary, temp_df, on="Chr", how="left")
 
-	fdr_bh_correct = statsmodels.stats.multitest.multipletests(gwas_adjusted["p"], alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
+	if bh_correction:
 
-	gwas_adjusted["BH_correction"] = fdr_bh_correct[1]
+		fdr_bh_correct = sm.multipletests(gwas_adjusted["p"], alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
 
-	gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["BH_correction"]/gwas_adjusted["genomic_inf_by_chr"]
+		gwas_adjusted["BH_correction"] = fdr_bh_correct[1]
+
+		gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["BH_correction"]/gwas_adjusted["genomic_inf_by_chr"]
+	
+	else:
+		gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["p"]/gwas_adjusted["genomic_inf_by_chr"]
 
 	print(color_text("Plotting the data with Manhattam and QQ plots", "yellow"))
 
@@ -777,6 +807,7 @@ ax.set_xlabel('Chromosome')
 
 #Linha threshold
 plt.axhline(y = -np.log10(5e-8), color = 'b', linestyle = '--')
+plt.axhline(y = -np.log10(5e-6), color = 'g', linestyle = '--')
 
 #Save to Output
 

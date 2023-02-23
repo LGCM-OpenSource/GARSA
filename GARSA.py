@@ -173,7 +173,7 @@ if command == "PRS":
 
 if command == "download_db":
 	script_to_run = os.path.join(script_path, "download_database.py")
-	subprocess.run("python3", script_to_run)
+	subprocess.run(["python3", script_to_run])
 
 c = ["dedup", "update_rsID", "rename_sample_id", "quality_control", "quality_ind", "kinship", "PCA", "GWAS", "PRS", "download_db"]
 
