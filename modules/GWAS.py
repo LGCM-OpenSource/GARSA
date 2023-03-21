@@ -82,6 +82,7 @@ arg_parser.add_argument("-kinship", "--kinship_grm", help = "Path for the kinshi
 arg_parser.add_argument("--make_king", help = "Make the kinship analysis (no correction by admixture", action="store_true")
 arg_parser.add_argument("-o", "--output_folder", help = "Wanted output folder (default: current output folder)")
 arg_parser.add_argument("-gcta", "--gcta_run", help = "Select gcta analysis for GWAS -- recomended for N sample < 5000", action="store_true")
+arg_parser.add_argument("-ind_snps", "--independent_snps", help = "File made by plink --indep-pairwise with extension *.prunne.in containing only independent SNPs for analysis -- Default is to run --indep-pairwise 50 5 0.08")
 arg_parser.add_argument("--bh_correction", help = "Select the p-value correction by Benjamini-Hochberg. Used for big populations (> 100.000) -- Use this flag to select to use BH correction, the default is to correct by Genomic Inflation", action="store_true")
 arg_parser.add_argument("-BoltLmm", "--BoltLmm_run", help = "Select Bolt-lmm for GWAS -- recomended for N samples > 5000", action="store_true")
 arg_parser.add_argument("-BoltLD", "--BoltLD_file", help = "Path for the Bolt-lmm LD file -- default: File provided by the BOLT-LMM distribution")
@@ -132,6 +133,7 @@ bolt_path = os.path.join(script_path, "BOLT-LMM_v2.4")
 bolt_run = args_dict["BoltLmm_run"]
 bolt_ld = args_dict["BoltLD_file"]
 bh_correction = args_dict["bh_correction"]
+ind_snps = args_dict["independent_snps"]
 
 #######################
 ## Pre-flight checks ##
@@ -254,7 +256,7 @@ if vcf_file: #Se foi dado amboms VCF e path do plink o programa executa o plink 
 		with open(plink_convert_out, "w") as out:
 			out.write(_try.stdout)
 		if _try.stderr:
-			print(color_text("WARNING: Plink1.9. Check error log file "+plink_convert_err, "red"))
+			print(color_text("WARNING: Plink1.9. Check error log file "+plink_convert_err, "yellow"))
 	except:
 		print(color_text("Error on Plink1.9 execution", "red"))
 		print(color_text("Path used for Plink1.9 executable = "+str(plink_path), "red"))
@@ -272,6 +274,57 @@ if vcf_file: #Se foi dado amboms VCF e path do plink o programa executa o plink 
 	exec_times.append(["Plink convertion step", plink_convertion_time])
 
 gwas_start = time.time()
+
+if not ind_snps:
+	plink_indep_out = os.path.join(temp_files, base_name+"_indep")
+
+	plink_indep_err = os.path.join(temp_files, "plink_indep.err")
+	plink_indep_out = os.path.join(temp_files, "plink_indep.out")
+
+	print(color_text("WARNING: Independent SNPS file not found. Running Plink --indep-pairwise 50 5 0.08", "yellow"))
+	try:
+		_try = subprocess.run([plink_path, "--bfile", bfile, "--indep-pairwise", "50", "5", "0.08", "--out", plink_indep_out, "--threads", threads], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+			text=True)
+		with open(plink_indep_err, "w") as err:
+			err.write(_try.stderr)
+		with open(plink_indep_out, "w") as out:
+			out.write(_try.stdout)
+		if _try.stderr:
+			print(color_text("WARNING: Plink1.9. Check error log file "+plink_indep_err, "yellow"))
+	except:
+		print(color_text("Error on Plink1.9 execution", "red"))
+		print(color_text("Path used for Plink1.9 executable = "+str(plink_path), "red"))
+		print(color_text("Error log is stored in "+plink_indep_err, "yellow"))
+		exit(1)
+ind_snps = plink_indep_out
+
+# ## Cheking FID IID in all covar files
+
+# fam_file = bfile+".fam"
+
+# fam = pd.read_csv(fam_file, sep=" ", header=None, names=["FID", "IID", "col1", "col2", "col3", "col4"], usecols=["FID", "IID"])
+# read_pheno = pd.read_csv(pheno, sep=None, engine="python")
+# read_qcovar = pd.read_csv(qcovar, sep=None, engine="python")
+# read_covar = pd.read_csv(covar, sep=None, engine="python")
+
+# #pheno data
+# final_pheno = pd.merge(fam, read_pheno, on=["FID", "IID"], how="left")
+# out_new_pheno = os.path.join(temp_files, "merged_phenotype.csv")
+# final_pheno.to_csv(out_new_pheno, index=False)
+# pheno = out_new_pheno
+
+# #covar data
+# final_covar = pd.merge(fam, read_covar, on=["FID", "IID"], how="left")
+# out_new_covar = os.path.join(temp_files, "merged_covar.csv")
+# final_covar.to_csv(out_new_covar, index=False)
+# covar = out_new_covar
+
+# #qcovar data
+# final_qcovar = pd.merge(fam, read_qcovar, on=["FID", "IID"], how="left")
+# out_new_qcovar = os.path.join(temp_files, "merged_qcovar.csv")
+# final_qcovar.to_csv(out_new_qcovar, index=False)
+# qcovar = out_new_qcovar
+
 
 ## Rodando GCTA
 gwas_output_check = out_dir_path
@@ -450,12 +503,13 @@ if not True in [c.endswith(".stats") for c in os.listdir(gwas_output_check)]:
 			## Como a quantidade de valores de covar e qcovars pode ser variavel faremos primeiro uma lista com todos os valores que são fixos
 			## bfile, phenoFile, phenoCol e covarFile precisam estar presentes -- Lembrando que o fenótipo é apenas 1 e permite que fique "Fixo" no código
 
-			start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+			start_command = ["bolt", "--bfile="+str(bfile),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
 			"--covarUseMissingIndic",
 			"--LDscoresFile="+str(bolt_ld),"--lmm",
 			"--phenoFile="+str(pheno), 
 			"--phenoCol="+str(pheno_col),
-			"--covarFile="+str(bolt_covars)]
+			"--covarFile="+str(bolt_covars),
+			"--modelSnps="+str(ind_snps)]
 
 			## Agora vamos gerar a lista com os comandos finais
 
@@ -506,12 +560,13 @@ if not True in [c.endswith(".stats") for c in os.listdir(gwas_output_check)]:
 
 			pheno_col = get_pheno_col.columns.tolist()[-1]
 
-			start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
+			start_command = ["bolt", "--bfile="+str(bfile),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats",
 			"--covarUseMissingIndic",
 			"--LDscoresFile="+str(bolt_ld),"--lmm",
 			"--phenoFile="+str(pheno), 
 			"--phenoCol="+str(pheno_col),
-			"--covarFile="+str(covar)]
+			"--covarFile="+str(covar),
+			"--modelSnps="+str(ind_snps)]
 
 			## Nesse caso, foi fornecido apenas o arquivo de covars
 
@@ -568,12 +623,13 @@ if not True in [c.endswith(".stats") for c in os.listdir(gwas_output_check)]:
 
 			pheno_col = get_pheno_col.columns.tolist()[-1]
 
-			start_command = ["bolt", "--bfile="+str(bfile), "--maxModelSnps="+str(total_n_of_SNPS),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
+			start_command = ["bolt", "--bfile="+str(bfile),"--numThreads="+str(threads), "--statsFile="+str(gwas_out)+".stats" ,
 			"--covarUseMissingIndic",
 			"--LDscoresFile="+str(bolt_ld),"--lmm",
 			"--phenoFile="+str(pheno), 
 			"--phenoCol="+str(pheno_col),
-			"--covarFile="+str(qcovar)]
+			"--covarFile="+str(qcovar),
+			"--modelSnps="+str(ind_snps)]
 
 			## Nesse caso, foi fornecido apenas o arquivo de qcovars
 

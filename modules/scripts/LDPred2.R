@@ -39,6 +39,7 @@ database = opt$database
 out_dir = opt$outdir
 n_pcs = opt$PCs
 threads = opt$threads
+bim_file = gsub(".bed", ".bim", bfile)
 
 ##Read in the phenotype, covariate and pcs files
 
@@ -61,6 +62,8 @@ pcs <- read.table(qcovar,
 pheno <- merge(phenotype, covariate) %>%
   merge(., pcs)
 
+bim_snps = read.table(bim_file)
+colnames(bim_snps) = c("chr", "rsID", "real_pos", "pos", "a0", "a1")
 
 ##HapMapSNPs
 
@@ -72,6 +75,7 @@ sumstats <- bigreadr::fread2(mlma)
 sumstats <- drop_na(sumstats)
 # Filter out hapmap SNPs
 print("Filtering SNPs using Reference -- database")
+sumstats <- sumstats[sumstats$rsid%in% bim_snps$rsID,] #Nessa etapa é necessário que tenha um intersect entre os dados do SumStats e os dados do .bim para garantir que o parametro info_snps e sumstats tenha exatamente o memsmo N de obs.
 sumstats <- sumstats[sumstats$rsid%in% info$rsid,]
 print(paste0(length(sumstats$rsid), " SNPs will be used for the LDPRED analysis"))
 
@@ -111,6 +115,10 @@ info_snp <- snp_match(sumstats, map,join_by_pos = FALSE)
 # Assign the genotype to a variable for easier downstream analysis
 print("Assign the genotype to a variable")
 genotype <- obj.bigSNP$genotypes
+# genotype <- genotype %>% drop_na()
+
+#geno_1 <- file.path(out_dir, "save_genotype_1.rdata")
+#save(genotype, file=geno_1)
 
 #imputation in genotype file, because it can't contains NA values
 #genotype_2 <- snp_fastImputeSimple(genotype, ncores = NCORES)
@@ -180,6 +188,7 @@ fam.order =
 # Reformat the phenotype file such that y is of the same order as the 
 # sample ordering in the genotype file
 y <- pheno[match(fam.order[,1],pheno[,1]),]
+# y %>% drop_na()
 
 # Calculate the null R2
 # use glm for binary trait 
@@ -189,7 +198,7 @@ y <- pheno[match(fam.order[,1],pheno[,1]),]
 sex_column <- names(covariate[3])
 
 null.model <- paste("PC", 1:n_pcs, sep = "", collapse = "+") %>%
-  paste0("Pheno~PRS",sex_column, "+", .) %>%
+  paste0("Pheno~",sex_column, "+", .) %>%
   as.formula %>%
   lm(., data = y) %>%
   summary
@@ -207,16 +216,19 @@ multi_auto <- snp_ldpred2_auto(
 )
 beta_auto <- sapply(multi_auto, function(auto)
   auto$beta_est)
-genotype <- obj.bigSNP$genotypes
+# genotype <- obj.bigSNP$genotypes
+# geno_2 <- file.path(out_dir, "save_genotype_2.rdata")
+# save(genotype, file=geno_2)
 # calculate PRS for all samples
 print("Starting PRS calculations for all samples")
 ind.test <- 1:nrow(genotype)
-pred_auto <-
+tryCatch(pred_auto <-
   big_prodMat(genotype,
               beta_auto,
               ind.row = ind.test,
-              ind.col = info_snp$`_NUM_ID_`)
+              ind.col = info_snp$`_NUM_ID_`), error= function(e) print(e))
 # scale the PRS generated from AUTO
+print("scale the PRS generated from AUTO")
 pred_scaled <- apply(pred_auto, 2, sd)
 final_beta_auto <-
   rowMeans(beta_auto[,
@@ -230,6 +242,7 @@ pred_auto <-
               ind.col = info_snp$`_NUM_ID_`)
 
 ##Get the final performance of the LDpred models
+print("Getting final performance of the model")
 reg.formula <- paste("PC", 1:n_pcs, sep = "", collapse = "+") %>%
   paste0("Pheno~PRS+",sex_column,"+", .) %>%
   as.formula
