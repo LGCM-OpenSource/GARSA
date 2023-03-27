@@ -121,7 +121,7 @@ genotype <- obj.bigSNP$genotypes
 #save(genotype, file=geno_1)
 
 #imputation in genotype file, because it can't contains NA values
-#genotype_2 <- snp_fastImputeSimple(genotype, ncores = NCORES)
+genotype_2 <- snp_fastImputeSimple(genotype, ncores = NCORES)
 
 # Rename the data structures
 CHR <- map$chr
@@ -140,7 +140,7 @@ for (chr in 1:22) {
   ind.chr2 <- info_snp$`_NUM_ID_`[ind.chr]
   # Calculate the LD
   corr0 <- snp_cor(
-    genotype,
+    genotype_2,
     ind.col = ind.chr2,
     ncores = NCORES,
     infos.pos = POS2[ind.chr2],
@@ -221,9 +221,9 @@ beta_auto <- sapply(multi_auto, function(auto)
 # save(genotype, file=geno_2)
 # calculate PRS for all samples
 print("Starting PRS calculations for all samples")
-ind.test <- 1:nrow(genotype)
+ind.test <- 1:nrow(genotype_2)
 tryCatch(pred_auto <-
-  big_prodMat(genotype,
+  big_prodMat(genotype_2,
               beta_auto,
               ind.row = ind.test,
               ind.col = info_snp$`_NUM_ID_`), error= function(e) print(e))
@@ -236,7 +236,7 @@ final_beta_auto <-
                            median(pred_scaled)) <
                        3 * mad(pred_scaled)])
 pred_auto <-
-  big_prodVec(genotype,
+  big_prodVec(genotype_2,
               final_beta_auto,
               ind.row = ind.test,
               ind.col = info_snp$`_NUM_ID_`)
