@@ -106,7 +106,7 @@ obj.bigSNP <- snp_attach(bfile_rds)
 # extract the SNP information from the genotype
 
 map <- obj.bigSNP$map[-3]
-names(map) <- c("chr", "rsid", "pos", "a1", "a0")
+names(map) <- c("chr", "rsid", "pos", "a0", "a1")
 
 # perform SNP matching
 print("SNP matching against reference")
