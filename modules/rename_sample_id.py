@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Parte da Integração de codigos FOXCONN
 
 ## manipulação e atualização de sample ids para caso o usuário deseje fazer esse tipo de alteração

@@ -1,6 +1,7 @@
+# -- coding: utf-8 --
 ## Inscript principal FOXCONN
 
-## União dos scripts em uma única ferramenta
+## Uniao dos scripts em uma única ferramenta
 
 # Bibliotecas necessárias
 

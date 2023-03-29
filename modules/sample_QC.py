@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Processo de QC para individuos com missing data ou erros de heterozigosidade
 
 # Bibliotecas necessárias

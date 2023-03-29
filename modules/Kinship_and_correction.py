@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Integração de codigos FOXCONN
 
 ## Kinship e correção de valores de kinship a partir destrutura populacional

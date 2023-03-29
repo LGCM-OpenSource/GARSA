@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Parte 3 Integração de codigos FOXCONN
 
 ## Processo de QC para dados após imputação

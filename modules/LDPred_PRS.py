@@ -1,4 +1,5 @@
-## Integração de codigos FOXCONN
+# -- coding: utf-8 --
+## Integracao de codigos FOXCONN
 
 ## PRS usando LD Pred2
 

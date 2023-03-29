@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Parte 1 integração de codigos FOXCONN
 
 ## Identificação e remoção de SNPs duplicados

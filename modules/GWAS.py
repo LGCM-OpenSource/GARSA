@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Integração de codigos FOXCONN
 
 ## GWAS usando GCTA e Manhattam plot

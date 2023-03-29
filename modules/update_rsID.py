@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Parte 2 Integração de codigos FOXCONN
 
 ## Anotação de SNPs usando rsID

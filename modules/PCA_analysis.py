@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 ## Processo de PCA 1 (não aparentados) e PCA 2 (extrapolação para aparentados)
 
 # Bibliotecas necessárias
