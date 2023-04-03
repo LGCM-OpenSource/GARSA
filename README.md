@@ -33,6 +33,7 @@ Dependencies:
     -- tidyverse
     -- tibble
     -- optparse
+    -- bigsnpr
     
 3. Tools needed in path
     -- Plink
