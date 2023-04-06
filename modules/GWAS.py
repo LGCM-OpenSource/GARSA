@@ -732,12 +732,12 @@ if gcta_run:
 
 		fdr_bh_correct = sm.multipletests(gwas_adjusted["p"], alpha=0.05, method='fdr_bh', is_sorted=False, returnsorted=False)
 
-		gwas_adjusted["BH_correction"] = fdr_bh_correct[1]
-
-		gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["BH_correction"]/gwas_adjusted["genomic_inf_by_chr"]
+		gwas_adjusted["Corrected_pvalues"] = fdr_bh_correct[1]
 	
 	else:
-		gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["p"]/gwas_adjusted["genomic_inf_by_chr"]
+		gwas_adjusted["corrected_chi2"] = gwas_adjusted.apply(lambda x: x["Chi2"]/x["genomic_inf_by_chr"], axis=1)
+		gwas_adjusted["pvalue_from_chi2_adjusted"] = gwas_adjusted.apply(lambda x: 1 - stats.chi2.cdf(x["corrected_chi2"],1), axis=1)
+		gwas_adjusted["Corrected_pvalues"] = gwas_adjusted["pvalue_from_chi2_adjusted"]
 
 	print(color_text("Plotting the data with Manhattam and QQ plots", "yellow"))
 
