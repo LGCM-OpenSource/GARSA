@@ -13,15 +13,16 @@ import textwrap
 import shutil
 import time
 import sys
+import re
 
 ###############
 ## Functions ##
 ###############
 
 tty_colors = {
-    'green' : '\033[0;32m%s\033[0m',
-    'yellow' : '\033[0;33m%s\033[0m',
-    'red' : '\033[0;31m%s\033[0m'
+	'green' : '\033[0;32m%s\033[0m',
+	'yellow' : '\033[0;33m%s\033[0m',
+	'red' : '\033[0;31m%s\033[0m'
 }
 
 # # or, example if wanting the ones from before with background highlighting
@@ -34,16 +35,16 @@ tty_colors = {
 
 def color_text(text, color='green'):
 
-    if sys.stdout.isatty():
-        return tty_colors[color] % text
-    else:
-        return text
+	if sys.stdout.isatty():
+		return tty_colors[color] % text
+	else:
+		return text
 
 
 def wprint(text):
 
-    print(textwrap.fill(text, width=80, initial_indent="\n  ", 
-          subsequent_indent="    ", break_on_hyphens=False))
+	print(textwrap.fill(text, width=80, initial_indent="\n  ", 
+		  subsequent_indent="    ", break_on_hyphens=False))
 
 # Identificar se o arquivo de fato existe
 
@@ -71,15 +72,16 @@ arg_parser.add_argument("--threads", help = "Number of computer threads -- defau
 #Se nenhum comando foi dado ao script, automaticamente é mostrado o "help"
 
 if len(sys.argv)==1:
-    arg_parser.print_help(sys.stderr)
-    sys.exit(0)
+	arg_parser.print_help(sys.stderr)
+	sys.exit(0)
 
 def update_header(header_output, new_header_output):
 	with open(header_output,'r') as main:
 		with open(new_header_output, 'w') as out:
 			input_data = main.read()
 			for key,value in dict_to_replace.items():
-				input_data = input_data.replace(key,value)
+				# input_data = input_data.replace(fr'\b{key}\b',value)
+				input_data = re.sub(fr'\b{key}\b',value, input_data)
 			out.write(input_data)
 
 ##################################
@@ -136,38 +138,38 @@ print("Working on ",base_name)
 # Se for dada uma path para output
 if output_folder:
 
-    provided_output = os.path.abspath(output_folder)
+	provided_output = os.path.abspath(output_folder)
 
-    # Criar a pasta do usuário na path providenciada
-    try:
-        os.mkdir(provided_output)
-    except:
-        print("\n")
+	# Criar a pasta do usuário na path providenciada
+	try:
+		os.mkdir(provided_output)
+	except:
+		print("\n")
 
-    out_dir_path = provided_output
+	out_dir_path = provided_output
 
-    print(color_text("Using specified directory for output: " + output_folder, "green"))
+	print(color_text("Using specified directory for output: " + output_folder, "green"))
 
 else:
-    #Se não for dado um output, usar o diretório atual
-    output_folder = os.getcwd()
+	#Se não for dado um output, usar o diretório atual
+	output_folder = os.getcwd()
 
-    out_dir_path = output_folder
+	out_dir_path = output_folder
 
-    print(color_text("No output directory specified, using current working directory: " + out_dir_path, "yellow"))
+	print(color_text("No output directory specified, using current working directory: " + out_dir_path, "yellow"))
 
 temp_files = os.path.join(out_dir_path, "tmp")
 try:
-    os.mkdir(temp_files)
+	os.mkdir(temp_files)
 except:
-    print(color_text("tmp folder exists, will keep using it"))
+	print(color_text("tmp folder exists, will keep using it"))
 
 print(color_text("Using "+threads+" threads"))
 
 if not bcftools_path:
-    bcftools_look_for_path = subprocess.run(["which", "bcftools"], stdout=subprocess.PIPE, text=True)
+	bcftools_look_for_path = subprocess.run(["which", "bcftools"], stdout=subprocess.PIPE, text=True)
 
-    bcftools_path = bcftools_look_for_path.stdout.strip()
+	bcftools_path = bcftools_look_for_path.stdout.strip()
 
 #######################
 ## Starting analysis ##
