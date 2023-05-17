@@ -207,7 +207,6 @@ optional arguments:
                         Path for the plink2 executable, requierd for script execution -- default is to look for the variable on path
   --threads THREADS     Number of computer threads -- default = 1
 ```
-The flag `-vcf` is required for execution  
 
 #### Update rsIDs module (update_rsID)
 
@@ -325,8 +324,10 @@ The output of this module recieves the suffix *.MIND.HET
 
 #### Kinship with correction for admixed populations
 
-This is a module that is suitable only for users with admixed populations (like the Brazilian population), other populations (like UKBB) can use the regular kinship calculations in the GWAS step using the flag *--make_king*. The input VCF is LD prunned before the start of the kinship calculations.
-In this analysis the kinship values are calculated by the *SNPRelate* library in R and then corrected using PCA for population structure corretion. For more details check [Conomos et. al (2016)](https://www.cell.com/ajhg/fulltext/S0002-9297(15)00496-6).
+This is a module that is suitable only for users with admixed populations (like the Brazilian population), other populations (like UKBB) can use the regular kinship calculations in the GWAS step using the flag *--make_king* when using GCTA. Otherwise, BOLT-LMM will automatically calculate the kinship matrix.    
+The input VCF is LD prunned before the start of the kinship calculations.  
+In this analysis the kinship values are calculated by the *SNPRelate* library in R and then corrected using PCA for population structure corretion.  
+For more details check [Conomos et. al (2016)](https://www.cell.com/ajhg/fulltext/S0002-9297(15)00496-6).  
 
 `python3  GARSA.py kinship -vcf path/to/data.vcf.gz --degree 2` 
 
@@ -443,9 +444,9 @@ If the user wishes to provide its own list of prunned SNPs, plesase do so using 
 *If using plink simply provide the .prune.in file*
 This allows the user to control what they consider as being Independent SNPs.  
 
-
-**Important to notice that BOLT-LMM calculates it's own kinship matrix and do not provide a way to input the corrected one calculated above.**
-**For heritability estimates check the log from either BOLT or GCTA runs**
+>**Note**
+>**Important to notice that BOLT-LMM calculates it's own kinship matrix and do not provide a way to input the corrected one calculated above.**  
+>**For heritability estimates check the log from either BOLT or GCTA runs**
 
 Phenotype file:
 
@@ -477,8 +478,9 @@ If the user wishes, more quantitative covariables can be added to this file.
 | 10002 | 10002 | 0.009 | -0.1 | 0.008 |
 
 #### Example using both covar and qcovar files
-**Important to reamember is that the user can select either '-gcta' or '-BoltLmm'**
-**Also the gcta mode for GWAS accepts the corrected kinship matix using the flag *-kinship* and providing the path for the generated .grm.* files. The user should provide only the prefix of the files, without the extension .grm.*.**
+>**Note**
+>**Important to reamember is that the user can select either '-gcta' or '-BoltLmm'**  
+>**Also the gcta mode for GWAS accepts the corrected kinship matix using the flag *-kinship* and providing the path for the generated .grm.* files. The user should provide only the prefix of the files, without the extension .grm.*.**
 
 `python3 GARSA.py GWAS -vcf path/to/data.vcf.gz -pheno phenotype_file.tab -qcovar data_PCA_total.txt -covar covar_file.tab -gcta -kinship R_kinship_for_GRM`
 
@@ -487,7 +489,8 @@ If the user wishes, more quantitative covariables can be added to this file.
 `python3 GARSA.py GWAS -vcf path/to/data.vcf.gz -pheno phenotype_file.tab -qcovar data_PCA_total.txt -gcta -kinship R_kinship_for_GRM`
 
 #### Example using only the covar file
-***WARNING: Not using the qcovar file migth introduce bias related to popualtion structure in the analysis!***
+>**Warning**
+>**Not using the qcovar file migth introduce bias related to popualtion structure in the analysis!**
 
 `python3 GARSA.py GWAS -vcf path/to/data.vcf.gz -pheno phenotype_file.tab -covar covar_file.tab -gcta -kinship R_kinship_for_GRM`
 
@@ -548,7 +551,7 @@ The file *GWAS_summary_adjusted_pvalues.csv* can be passed to [FUMA](https://fum
 ## Polygenic Risk Score - PRS
 
 >**Warning**
->:warning: **This step requires an independent dataset from the one used in the GWAS step**
+>**This step requires an independent dataset from the one used in the GWAS step**  
 >To generate the Principal component analysis to use in this step, please refer to the [PCA module](#pca-module)
 
 This module performs the reestimation of betas calculated in the GWAS step (present in the summary statistics file, either *.mlma* or *.stats*).  
