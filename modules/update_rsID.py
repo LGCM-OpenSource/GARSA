@@ -63,8 +63,8 @@ def check_file_exists(file):
 ### Help and argument parser ###
 ################################
 
-arg_parser = argparse.ArgumentParser(description = "This is a script to update SNP rsIDs (for hg19). This script assumes that your file name have the pattern chr[1-22], e.g project_name_chr12.extensions", 
-	epilog = "Ex. usage: script.py  ") ## AJUSTAR A DESCRIÇÃO
+arg_parser = argparse.ArgumentParser(description = "This is a script to update SNP rsIDs on a VCF file.", 
+	epilog = "Ex. usage: update_rsID.py -vcf file.vcf.gz -ref_hg hg37 -o output/folder/path  ") ## AJUSTAR A DESCRIÇÃO
 
 arg_parser.add_argument("-vcf", "--vcf_file", help = "File for processing, requierd for script execution")
 arg_parser.add_argument("-ref_hg", "--ref_build", help = "Select the human genome build version -- hg37 or hg38, default=hg37", default="hg37")

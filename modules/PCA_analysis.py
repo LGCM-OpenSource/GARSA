@@ -71,6 +71,7 @@ arg_parser.add_argument("-related", "--related_file", help = "File from the kins
 arg_parser.add_argument("--window_size", help = "Window size for prunning step -- default = 1000", default="1000")
 arg_parser.add_argument("--sliding_window_step", help = "Sliding Window step -- default = 50", default="50")
 arg_parser.add_argument("--prune_r2", help = "R2 value for prunning-- default = 0.03", default="0.03")
+arg_parser.add_argument("--Hg", help = "Hg version for use -- 38 or 37. Default=37", default="37")
 # arg_parser.add_argument("--N_pop", help = "Number of expected populations in sample, if provided no testing for best K is performed -- The default is for automatic look up using admixture")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
 # arg_parser.add_argument("--garsa_path", help = "Path to main script GARSA -- always provided by default")
@@ -118,6 +119,7 @@ step_size = args_dict["sliding_window_step"]
 prune_r2 = args_dict["prune_r2"]
 threads = args_dict["threads"]
 output_folder = args_dict["output_folder"]
+hg = args_dict["Hg"]
 # GARSA_path = args_dict["garsa_path"]
 GARSA_path = os.getcwd()
 # N_pop = args_dict["N_pop"]
@@ -271,7 +273,10 @@ print(color_text("Removing Long Range LD regions"))
 
 long_ld_start = time.time() 
 
-ld_long_databse = os.path.join(database_path, "long_range_hg19.txt")
+if hg == "37":
+    ld_long_databse = os.path.join(database_path, "long_range_hg19.txt")
+if hg == "38":
+    ld_long_databse = os.path.join(database_path, "long_range_hg38.txt")
 
 set_to_remove = os.path.join(temp_files, "Long_range_LD.to_remove") #O plink acrescenta a extensão .set nesse arquivo (--write-set)
 
