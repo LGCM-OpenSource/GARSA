@@ -486,7 +486,10 @@ If the user wishes, more quantitative covariables can be added to this file.
 #### Example using both covar and qcovar files
 >**Note**
 >**Important to reamember is that the user can select either '-gcta' or '-BoltLmm'**  
->**Also the gcta mode for GWAS accepts the corrected kinship matix using the flag *-kinship* and providing the path for the generated .grm.* files. The user should provide only the prefix of the files, without the extension .grm.*.**
+>**Also the gcta mode for GWAS accepts the corrected kinship matix using the flag *-kinship* and providing the path for the generated .grm.* files. The user should provide only the prefix of the files, without the extension .grm.*.**  
+
+>**Note**  
+>Remember to activate the *boltlmm* environment before running the GWAS module with the bolt-lmm flag --> `conda activate boltlmm`  
 
 `python3 GARSA.py GWAS -vcf path/to/data.vcf.gz -pheno phenotype_file.tab -qcovar data_PCA_total.txt -covar covar_file.tab -gcta -kinship R_kinship_for_GRM`
 
