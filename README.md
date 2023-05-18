@@ -1,4 +1,6 @@
-GARSA was develped using Python3 and aims to semi-automate the main steps for Genome Wide Association Study and Polygenic Risk Score analysis
+GARSA was develped using Python3 and aims to semi-automate the main steps for Genome Wide Association Study and Polygenic Risk Score analysis  
+>For now, GARSA only works with Linear Mixed Models (LMM) for populations with continuous traits and related samples.  
+>We aim to improve GARSA functionalities over time, requests and bug reports should be made in the *Issues* session on this page.  
 
 ```
 Dependencies:
@@ -62,7 +64,9 @@ conda env create -f GARSA-env.yml
 conda env create -f boltlmm.yml
 
 ```
-Obs: remember to activate the environment before running the GWAS module with the bolt-lmm flag  
+>**Note**  
+>Remember to activate the environment before running the GWAS module with the bolt-lmm flag  
+
 4. Install R and some python dependencies in the GARSA environment
 
 ```bash
@@ -100,6 +104,10 @@ The downloaded data is placed in the `~/GARSA/databases` folder
 
 Once all the dependencies and envrionments are in place, running the GARSA pipeline should be relatively simple.  
 The main GARSA module (GARSA.py) wraps all the available modules, which can be called independently.  
+
+>**Note**
+>Affter GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
+>GARSA can be added to your path by adding `export PATH=path/to/GARSA.py:$PATH` to you .bashrc or .bash_profile file in your *home* folder  
 
 ```bash
 usage: GARSA.py [-h]
