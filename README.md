@@ -53,9 +53,7 @@ Dependencies:
 
 1. Download or clone this repository: `git clone https://github.com/LGCM-OpenSource/GARSA.git`
 
-2. Make GARSA executable by adding yourpath/metaWRAP/bin/ directory to to your $PATH. Either add the line PATH=yourpath/metaWRAP/bin/:$PATH to your ~/.bash_profile script, or copy over the contents of yourpath/metaWRAP/bin/ into a location already in your $PATH (such as /usr/bin/ or /miniconda2/bin/)
-
-3. Install GARSA dependencies with the provided conda environments (.yml) located at ~/GARSA/modules/scripts/ 
+2. Install GARSA dependencies with the provided conda environments (.yml) located at ~/GARSA/modules/scripts/ 
 ```bash
 #GARSA environment
 conda env create -f GARSA-env.yml
@@ -107,7 +105,7 @@ The main GARSA module (GARSA.py) wraps all the available modules, which can be c
 
 >**Note**
 >After GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
->GARSA can be added to your path by adding `export PATH=path/to/GARSA.py:$PATH` to your .bashrc or .bash_profile file in your *home* folder  
+>GARSA can be added to your path by adding `export PATH=path/to/GARSA:$PATH` to your .bashrc or .bash_profile file in your *home* folder  
 
 ```bash
 usage: GARSA.py [-h]
