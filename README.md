@@ -106,7 +106,7 @@ Once all the dependencies and envrionments are in place, running the GARSA pipel
 The main GARSA module (GARSA.py) wraps all the available modules, which can be called independently.  
 
 >**Note**
->Affter GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
+>After GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
 >GARSA can be added to your path by adding `export PATH=path/to/GARSA.py:$PATH` to you .bashrc or .bash_profile file in your *home* folder  
 
 ```bash
