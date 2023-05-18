@@ -609,9 +609,9 @@ optional arguments:
 The main result from this analysis is the table ***weights_LDPred2.tsv***, which contains 3 columns:
 ```
 rsID	A1	LDPRED2_betas
-rs3131972	A	2,35E+07
-rs3131969	A	2,12E+06
-rs1048488	C	7,32E+07
+rs3131972	A	2,35E-07
+rs3131969	A	2,12E-06
+rs1048488	C	7,32E-07
 ```
 1. The first column is the rsID of the variant
 2. The second is the effect allele
