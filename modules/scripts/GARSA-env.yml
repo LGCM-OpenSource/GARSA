@@ -442,11 +442,13 @@ dependencies:
     - line-profiler==4.0.3
     - matplotlib==3.7.1
     - pandas==2.0.1
+    - patsy==0.5.3
     - pillow==9.5.0
     - pyparsing==3.0.9
     - pytz==2023.3
     - scipy==1.10.1
     - seaborn==0.12.2
+    - statsmodels==0.14.0
     - tzdata==2023.3
     - xyzservices==2023.2.0
 prefix: /home/fernando/anaconda3/envs/GARSA-env

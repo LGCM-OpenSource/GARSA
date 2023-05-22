@@ -112,7 +112,7 @@ usage: GARSA.py [-h]
 
 This script integrates each analysis of the GARSA pipeline
 ______________________________________________________________
-desdup			-- Runs the desduplication analysis, removing duplicated SNPs or multiallelic variants
+dedup			-- Runs the desduplication analysis, removing duplicated SNPs or multiallelic variants
 update_rsID		-- Runs the update of all (possible) rsIDs using hg19 or hg38 references
 rename_sample_id	-- Runs an update of samples ID
 quality_control		-- Runs the quality control script for SNPs
@@ -213,7 +213,7 @@ optional arguments:
                         Path for the plink2 executable, requierd for script execution -- default is to look for the variable on path
   --threads THREADS     Number of computer threads -- default = 1
 ```
-
+>The outputed VCF file has the *.unique* suffix
 #### Update rsIDs module (update_rsID)
 
 This module will annotate the users variants using the dbSNP dataset. The user should provide a VCF file and the correct human assembly (hg37 or hg38) version. In this step GARSA will attempt to flip and swap variants in relation to the reference to guarantee correct annotations.  
@@ -622,11 +622,14 @@ rs1048488	C	7,32E-07
     
 | Module | Time | Peak Mem (Gb) | Threads |
 | ------ | ------ | ------ | ------ |
-| desdup | 00:00:04 | 0.2 | 4 |
-| update_rsID | 00:00:22 | 0.12 | 4 |
+| desdup | 00:00:05 | 0.401 | 4 |
+| update_rsID | 00:00:22 | 30.0 | 4 |
 | quality_control | 00:00:03 | 0.2 | 4 |
 | quality_ind | 00:00:05 | 0.2 | 4 |
 | kinship | 00:00:08 | 0.7 | 4 |
 | PCA | 00:00:15 | 0.3 | 4 |
 | GWAS | 00:02:20 | 1.3 | 4 |
 | PRS | 05:20:00 | 14.8 | 4 |
+
+>**Warning**  
+>The RAM usage in the *update_rsID* module may vary depending on the number of variants in the user VCF file  

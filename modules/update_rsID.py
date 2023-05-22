@@ -73,7 +73,7 @@ arg_parser.add_argument("-plink2", "--plink2_path", help = "Path for the Plink2 
 arg_parser.add_argument("-plink", "--plink_path", help = "Path for the Plink1.9 executable, requierd for script execution -- default is to look for the variable on path")
 arg_parser.add_argument("-o", "--output_folder", help = "Wanted output folder (default: current output folder)")
 arg_parser.add_argument("-rm_tmp", "--rm_temp_files", help = "Force keeping temporary files (Files may be quite large) -- default: Delete temporary files", action="store_true")
-arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default=1)
+arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
 
 #Se nenhum comando foi dado ao script, automaticamente é mostrado o "help"
 
@@ -213,21 +213,21 @@ correct_output = os.path.join(out_dir_path, correct_output_file)
 
 #1 Step - Compare vcf input file and reference for reference filtering
 
-temp_filtered_file = os.path.join(temp_files, "filtered_temp_ref_tab.vcf.gz")
+# temp_filtered_file = os.path.join(temp_files, "filtered_temp_ref_tab.vcf.gz")
 
 temp_filetered_vcf_file = os.path.join(temp_files, "filtered_temp_ref.vcf.gz")
 
 print(color_text("Filtering snps from database"))
 
-if os.path.exists(temp_filtered_file) and os.path.exists(temp_filetered_vcf_file):
+if os.path.exists(temp_filetered_vcf_file):
 	print("database files already created")
 else:
 	output_vcf_to_filter = os.path.join(temp_files, "database_rsids_filter.txt")
-	subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filtered_file, "--no-header", "--threads", threads])
+	# subprocess.run([bcftools_path, "view", "-R", file_path, database_file_1, "-Oz", "-o", temp_filtered_file, "--no-header", "--threads", threads])
 
 	print(color_text("Table creation done"))
 
-	subprocess.run([bcftools_path, "view", "-R", vcf_file, database_file_1, "-Oz", "-o", temp_filetered_vcf_file, "--threads", threads])
+	subprocess.run([bcftools_path, "view", "-R", file_path, database_file_1, "-Oz", "-o", temp_filetered_vcf_file, "--threads", threads])
 
 	subprocess.run([bcftools_path, "index", "-f","-t", temp_filetered_vcf_file, "--threads", threads])
 
@@ -267,7 +267,7 @@ user_bim = pd.read_csv(temp_user_bim+".bim", sep="\t", header=None, names=["Chr"
 
 #Get ref vcf
 
-ref_vcf = pd.read_csv(temp_filtered_file, sep="\t", header=None, names=["Chr", "Position", "rsID", "REF", "ALT", "coisa", "coisa1", "INFO"], dtype="str")
+ref_vcf = pd.read_csv(temp_filetered_vcf_file, sep="\t", memory_map=True,comment="#",header=None, names=["Chr", "Position", "rsID", "REF", "ALT", "coisa", "coisa1", "INFO"], dtype="str")
 ref_vcf_explode = ref_vcf.assign(ALT=ref_vcf["ALT"].str.split(",")).explode("ALT")
 # ref_vcf_explode
 
