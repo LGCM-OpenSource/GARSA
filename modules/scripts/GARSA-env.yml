@@ -318,6 +318,9 @@ dependencies:
   - r-purrr=1.0.1=r42h133d619_0
   - r-quantmod=0.4.20=r42h6115d3f_0
   - r-quantreg=5.93=r42h640688f_0
+  - r-r.methodss3=1.8.2=r42hc72bb7e_1
+  - r-r.oo=1.25.0=r42hc72bb7e_1
+  - r-r.utils=2.12.2=r42hc72bb7e_0
   - r-r6=2.5.1=r42hc72bb7e_1
   - r-randomforest=4.7_1.1=r42h640688f_0
   - r-rappdirs=0.3.3=r42h06615bd_1
