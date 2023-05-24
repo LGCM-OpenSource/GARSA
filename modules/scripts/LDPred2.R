@@ -5,7 +5,8 @@ library(data.table)
 library(magrittr)
 library(ggplot2)
 library(optparse)
-library(tidyverse)
+library(tidyr)
+# library(tidyverse)
 
 option_list = list(make_option(c("--bfile"), type="character", default=NULL, 
                                help="bfile for processing", metavar="character"),
