@@ -579,7 +579,7 @@ print("Moving files")
 admix_output = GARSA_path
 
 for file in os.listdir(admix_output):
-    if file.endswith(".txt"):
+    if file.startswith("eigenvalues") or file.startswith("eigenvectors"):
         values_current = os.path.join(admix_output, file)
         values_new = os.path.join(temp_files, file)
         shutil.move(values_current, values_new)
@@ -798,7 +798,7 @@ if os.path.getsize(related_file) > 0:
 
     pca_total.to_csv(output_pca_gwas, index=False, sep=" ", header=False)
 
-    print(color_text("PCA file for covar in GWAS generated as "+output_pca_gwas))
+    print(color_text("PCA qcovar file for GWAS (with GCTA) generated as "+output_pca_gwas))
 
     pca_2_end = time.time()
 

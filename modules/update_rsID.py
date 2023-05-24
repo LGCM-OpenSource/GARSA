@@ -227,9 +227,9 @@ else:
 
 	print(color_text("Table creation done"))
 
-	subprocess.run([bcftools_path, "view", "-R", file_path, database_file_1, "-Oz", "-o", temp_filetered_vcf_file, "--threads", threads])
+	subprocess.run([bcftools_path, "view", "-T", file_path, database_file_1, "-Oz", "-o", temp_filetered_vcf_file,"--threads", threads])
 
-	subprocess.run([bcftools_path, "index", "-f","-t", temp_filetered_vcf_file, "--threads", threads])
+	subprocess.run([bcftools_path, "index", "-f","-t", temp_filetered_vcf_file ,"--threads", threads])
 
 	print(color_text("databse VCF creation done"))
 

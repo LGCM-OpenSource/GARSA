@@ -35,6 +35,7 @@ Dependencies:
     -- tidyverse
     -- tibble
     -- optparse
+    -- remotes
     -- bigsnpr
     
 3. Pre-installed in the GARSA-env
@@ -52,6 +53,10 @@ Dependencies:
 ## Instalation
 
 1. Download or clone this repository: `git clone https://github.com/LGCM-OpenSource/GARSA.git`
+
+>**Note**
+>Before starting update conda with `conda update -n base -c conda-forge conda`
+>Then clean your unused conda packages and caches with `conda clean -i -p -t`
 
 2. Install GARSA dependencies with the provided conda environments (.yml) located at ~/GARSA/modules/scripts/ 
 ```bash
@@ -78,6 +83,12 @@ R -q -e 'remotes::install_github("privefl/bigsnpr")'
 
 ```
 
+>**Warning**
+>The GARSA-env uses aorund 2.3Gb of disk space after complete instalation using conda  
+
+>**Note**
+>After GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
+>GARSA can be added to your path by adding `export PATH=path/to/GARSA:$PATH` to your .bashrc or .bash_profile file in your *home* folder  
 ## Databases 
 
 We provide the necessaire datasets for Bolt-lmm, LDPred2 execution, alongside the long-range LD prunning data for both hg37 and hg38.
@@ -97,15 +108,10 @@ The downloaded data is placed in the `~/GARSA/databases` folder
 | long-range regions Hg38 | 888 b    |
 
 
-
 ## Usage
 
 Once all the dependencies and envrionments are in place, running the GARSA pipeline should be relatively simple.  
 The main GARSA module (GARSA.py) wraps all the available modules, which can be called independently.  
-
->**Note**
->After GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
->GARSA can be added to your path by adding `export PATH=path/to/GARSA:$PATH` to your .bashrc or .bash_profile file in your *home* folder  
 
 ```bash
 usage: GARSA.py [-h]
@@ -329,6 +335,9 @@ optional arguments:
 The output of this module recieves the suffix *.MIND.HET
 
 #### Kinship with correction for admixed populations
+
+>**Warning**
+>This step requires the *genio* R package, reamember to install it!  
 
 This is a module that is suitable only for users with admixed populations (like the Brazilian population), other populations (like UKBB) can use the regular kinship calculations in the GWAS step using the flag *--make_king* when using GCTA. Otherwise, BOLT-LMM will automatically calculate the kinship matrix.    
 The input VCF is LD prunned before the start of the kinship calculations.  
@@ -623,11 +632,11 @@ rs1048488	C	7,32E-07
 | Module | Time | Peak Mem (Gb) | Threads |
 | ------ | ------ | ------ | ------ |
 | desdup | 00:00:05 | 0.401 | 4 |
-| update_rsID | 00:00:22 | 30.0 | 4 |
+| update_rsID | 00:08:00 | 0.6 | 4 |
 | quality_control | 00:00:03 | 0.2 | 4 |
 | quality_ind | 00:00:05 | 0.2 | 4 |
-| kinship | 00:00:08 | 0.7 | 4 |
-| PCA | 00:00:15 | 0.3 | 4 |
+| kinship | 00:00:07 | 0.7 | 4 |
+| PCA | 00:00:13 | 0.3 | 4 |
 | GWAS | 00:02:20 | 1.3 | 4 |
 | PRS | 05:20:00 | 14.8 | 4 |
 
