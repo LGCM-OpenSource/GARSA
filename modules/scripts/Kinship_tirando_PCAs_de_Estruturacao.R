@@ -48,7 +48,7 @@ gds <- seqOpen(gds_file)
 
 #Para que seja possivel separar as relações de ancestralidade distantes (estrutura populacional) 
 #das relações de parentesco recentes (relação familiar)
-#será implementada a analise feita por Conomos et al., 2016 --> https://www.cell.com/ajhg/fulltext/S0002-9297(15)00496-6
+#sera implementada a analise feita por Conomos et al., 2016 --> https://www.cell.com/ajhg/fulltext/S0002-9297(15)00496-6
 
 #Para isso são feitas 3 analises KING, PC-AiR, e PC-Relate:
 #1. KING --> calculo robusto para estrutura familiar, mas não robusto para a estrutura da população
@@ -88,7 +88,7 @@ dev.off()
 #não relacionado para garantir a representação de ancestralidade. 
 #Também usamos as estimativas KING-robust como nossas medidas de parentesco (kinMat)
 
-# Uma vez que os conjuntos não relacionados e relacionados são identificados, o PC-AiR executa uma Análise de Componente Principal 
+# Uma vez que os conjuntos não relacionados e relacionados são identificados, o PC-AiR executa uma Analise de Componente Principal 
 #(PCA) padrão no conjunto não relacionado de indivíduos e, em seguida, projeta os parentes nesses componentes (PCs).
 
 # Agora vamos fazer a analise de PCA tendo como base o KINSHIP para dividir a população entre aparentados e não aparentados
@@ -109,7 +109,7 @@ colnames(pcs) <- paste0('PC', 1:10)
 # E vamos ajustar o nome das amostras/individuos
 pcs$sample.id <- pca$sample.id
 
-# Para checar quantos PCs são necessários para explicar a variancia no dado fazemos:
+# Para checar quantos PCs são necessarios para explicar a variancia no dado fazemos:
 
 #1. Checar a variancia total de cada PC
 #Biblioteca para analisar o df coluna a coluna
@@ -142,14 +142,14 @@ iterator <- SeqVarBlockIterator(seqData, verbose=FALSE)
 
 #Calcular as novas relações com a correção do PCA
 #O argumento training.set permite especificar quais amostras usar para “aprender” o ajuste de ancestralidade
-#recomendamos o conjunto não relacionado da análise PC-AiR.
+#recomendamos o conjunto não relacionado da analise PC-AiR.
 pcrel <- pcrelate(iterator, 
                   pcs=pca$vectors[,1:4], 
                   training.set=pca$unrels)
 
 #Plotamos as estimativas de parentesco pareadas (KINSHIP) contra as estimativas IBD0 (k0) 
 #(a proporção de variantes para as quais o par de indivíduos compartilha 0 alelos idênticos por descendência (IBD)). 
-#Usamos um gráfico hexbin para visualizar o parentesco para todos os pares de amostras.
+#Usamos um grafico hexbin para visualizar o parentesco para todos os pares de amostras.
 plot_3=paste0(out_path, "/kinship_corrected.png")
 png(plot_3, res=300,width = 1500, height = 1600)
 ggplot(pcrel$kinBtwn, aes(k0, kin)) +
@@ -179,7 +179,7 @@ write.table(KingxIBD,output_file,
 
 ##### ESTER #####################################
 
-# Pivot_wider. Até aqui vcs já tinham chegado
+# Pivot_wider. Até aqui vcs ja tinham chegado
 king_active <- KingxIBD %>% 
   select(ID1, ID2, kin) %>% 
   pivot_wider(id_cols = ID1,
@@ -196,7 +196,7 @@ king_active <- king_active %>%
 # Agora temos que fazer a mesma coisa com as colunas. Primeiro as mais vazias, depois as mais completas
 col_order = sort(x = colSums(!is.na(king_active)),
                  decreasing = F) # cria um vetor com a contagem de valores diferentes de NA, onde os nomes são os nomes das colunas e os valores são a contagem
-names_order = names(col_order) # Cria um vetor com os nomes já ordenados
+names_order = names(col_order) # Cria um vetor com os nomes ja ordenados
 
 # Organizando as colunas da mais esparsa para a menos esparsa
 king_active <- king_active %>% 
