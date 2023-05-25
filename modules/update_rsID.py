@@ -407,9 +407,31 @@ exec_times.append(["Indexing", indexing_time])
 annotation_start = time.time()
 
 print(color_text("Starting annotation"))
-annot_output_file = file_name.replace(".vcf.gz", ".RSIDs.vcf.gz")
-annot_output = os.path.join(out_dir_path,annot_output_file)
+annot_output_file = file_name.replace(".vcf.gz", "tmp.RSIDs.vcf.gz")
+
+final_annot_output_file = file_name.replace(".vcf.gz", ".RSIDs.vcf.gz")
+
+annot_output = os.path.join(temp_files,annot_output_file)
+
+final_annot_output = os.path.join(out_dir_path,final_annot_output_file)
+
 subprocess.run([bcftools_path,"annotate","--threads",threads,"-a",temp_filetered_vcf_file, "-c","ID", "-Oz","-o",annot_output,flipped_out+".vcf.gz"])
+
+#Read output VCF
+
+annotated_vcf = pd.read_table(annot_output, header=None,comment="#",usecols=[2])
+duplicated_list = annotated_vcf[annotated_vcf[2].duplicated() == True][2].values.tolist()
+
+# print(duplicated_list)
+# print('|'.join(duplicated_list))
+
+#zgrep "rs35365738" GARSA_final_example.unique.RSIDs.R2andQC.MIND.HET.vcf.gz
+
+#Remove possible duplicates
+print(color_text("Looking for possible duplicated rsIDs after annotation"))
+if len(duplicated_list) > 0:
+	print(color_text(f"Found {len(duplicated_list)} duplicated rsIDs. Removing ...", "yellow"))
+	subprocess.run([f"zgrep -v -E '{'|'.join(duplicated_list)}' {annot_output} > {final_annot_output}"], shell=True)
 
 print(color_text("Indexing compressed file"))
 subprocess.run([bcftools_path,"index","-f","--threads",threads,"-t",annot_output])
