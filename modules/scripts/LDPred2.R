@@ -6,6 +6,7 @@ library(magrittr)
 library(ggplot2)
 library(optparse)
 library(tidyr)
+library(dplyr)
 # library(tidyverse)
 
 option_list = list(make_option(c("--bfile"), type="character", default=NULL, 
@@ -112,7 +113,8 @@ names(map) <- c("chr", "rsid", "pos", "a0", "a1")
 # perform SNP matching
 print("SNP matching against reference")
 info_snp <- snp_match(sumstats, map,join_by_pos = FALSE)
-
+info_snp = 
+  info_snp %>% distinct(rsid, .keep_all = T)  ##################  MUDEI AQUI #########################################################################################
 # Assign the genotype to a variable for easier downstream analysis
 print("Assign the genotype to a variable")
 genotype <- obj.bigSNP$genotypes
@@ -262,20 +264,26 @@ print("Generating final dataset")
 #Recuperar rsID, alelo1 e betas_auto
 
 #rsID e alelo 1 estão em sumstats!
-
+print("rsID to dataframe")
 rsID <- sumstats$rsid %>% as.data.frame() %>% rename("rsID" = ".")
+print("A1 to dataframe")
 allele1 <- sumstats$a0 %>% as.data.frame() %>% rename("A1" = ".")
-
+print("LDPred betas to dataframe")
 beta_new <- final_beta_auto %>% as.data.frame() %>% rename("LDPRED2_betas" = ".")
 
 final_dataset <- NULL
 
 final_dataset$rsID <- rsID$rsID
+
 final_dataset$A1 <- allele1$A1
+
 final_dataset$LDPRED2_betas <- beta_new$LDPRED2_betas
 
-file_output <- file.path(out_dir, "weights_LDPRED2.tsv")
+image_out <- file.path(out_dir, "LDPRED_Img.RData")
+save.image(file=image_out)
 
+file_output <- file.path(out_dir, "weights_LDPRED2.tsv")
+print("writing table")
 write.table(final_dataset, 
             file = file_output,
             sep = "\t", row.names = FALSE,
