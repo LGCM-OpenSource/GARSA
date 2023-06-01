@@ -84,6 +84,7 @@ arg_parser.add_argument("--pheno_col", help = "Name of the columns contaning the
 arg_parser.add_argument("-qcovar", "--quantitative_covar", help = "Path for the quantitative covariables, e.g. PCs, age, and other continuous variables. The same used on the GWAS step")
 arg_parser.add_argument("-n_pcs", "--number_of_pcs", help = "Number of PCs to use on model evaluation -- default = 4", default="4")
 arg_parser.add_argument("-covar", "--covar_file", help = "Path for the covariables file, e.g. Sex. The same used on the GWAS step")
+arg_parser.add_argument("--indep_pop", help = "Independent population, in VCF format, for individual PRS calculation; default is to use the same one provided by -vcf or -bfile")
 arg_parser.add_argument("-o", "--output_folder", help = "Wanted output folder (default: current output folder)")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
 
@@ -130,6 +131,7 @@ covar = args_dict["covar_file"]
 n_pcs = args_dict["number_of_pcs"]
 bolt = args_dict["BOLT"]
 pheno_col = args_dict["pheno_col"]
+indep_pop = args_dict["indep_pop"]
 
 #######################
 ## Pre-flight checks ##
@@ -366,7 +368,14 @@ for file in os.listdir(out_put_LDpred):
 
 print(color_text("Starting PRS calculation from the LDpred2 weights"))
 
-in_bfile = plink_out
+if indep_pop:
+	# indep_bfile = os.path.join(temp_files, "independent_pop")
+	in_bfile = os.path.join(temp_files, "independent_pop")
+
+	subprocess.run([plink2_path, "--vcf", indep_pop, "--max-alleles", "2", "--make-bed", "--out", in_bfile, "--threads", threads])
+else:	
+	in_bfile = plink_out
+
 in_weight_scores = os.path.join(out_put_LDpred, "weights_LDPRED2.tsv")
 
 output_PRS = os.path.join(out_dir_path, "PRS_scores")
