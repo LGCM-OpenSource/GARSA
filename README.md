@@ -54,9 +54,9 @@ Dependencies:
 
 1. Download or clone this repository: `git clone https://github.com/LGCM-OpenSource/GARSA.git`
 
->**Note**
->Before starting update conda with `conda update -n base -c conda-forge conda`
->Then clean your unused conda packages and caches with `conda clean -i -p -t`
+>**Note**  
+>Before starting, update conda with `conda update -n base -c conda-forge conda`  
+>Then clean your unused conda packages and caches with `conda clean -i -p -t`  
 
 2. Install GARSA dependencies with the provided conda environments (.yml) located at ~/GARSA/modules/scripts/ 
 ```bash
@@ -83,20 +83,20 @@ R -q -e 'remotes::install_github("privefl/bigsnpr")'
 
 ```
 
->**Warning**
+>**Warning**  
 >The GARSA-env uses aorund 2.3Gb of disk space after complete instalation using conda  
 
->**Note**
+>**Note**  
 >After GARSA instalation run `chmod +x GARSA.py` from the main GARSA folder to make it executable  
 >GARSA can be added to your path by adding `export PATH=path/to/GARSA:$PATH` to your .bashrc or .bash_profile file in your *home* folder  
 ## Databases 
 
-We provide the necessaire datasets for Bolt-lmm, LDPred2 execution, alongside the long-range LD prunning data for both hg37 and hg38.
+We provide the necessaire datasets for Bolt-lmm, LDPred2 execution, alongside the long-range LD prunning data for both hg37 and hg38.  
 
 Also, for large database downloads we provide the script `download_db`  
 This script will download the dbSNP database (version b151) in VCF format and the corresponding indexing file (.tbi)  
 
-The downloaded data is placed in the `~/GARSA/databases` folder
+The downloaded data is placed in the `~/GARSA/databases` folder  
 
 | Database                | Size     |
 |-------------------------|----------|
@@ -140,9 +140,9 @@ Each GARSA module is run separately. For exemple, a simple SNP quality control r
 GARSA.py quality_control -vcf path/to/data.vcf.gz --score_type r2 -o output/folder/path --threads 4
 ```
 
-## Detailed usage for each module
+## Detailed usage for each module  
 
-### Advices:
+### Advices:  
 ---------------------------------------------------------------------------------------------------------------------------------------------
 **Before the analysis starts, we recommend to check which individuals have the desired phenotype (to be used in the GWAS) and filter the dataset -- e.g. keep genotype data only for the samples with phenotype data.**  
 
@@ -336,7 +336,7 @@ The output of this module recieves the suffix *.MIND.HET
 
 #### Kinship with correction for admixed populations
 
->**Warning**
+>**Warning**  
 >This step requires the *genio* R package, reamember to install it!  
 
 This is a module that is suitable only for users with admixed populations (like the Brazilian population), other populations (like UKBB) can use the regular kinship calculations in the GWAS step using the flag *--make_king* when using GCTA. Otherwise, BOLT-LMM will automatically calculate the kinship matrix.    
@@ -569,7 +569,7 @@ The file *GWAS_summary_adjusted_pvalues.csv* can be passed to [FUMA](https://fum
 ## Polygenic Risk Score - PRS
 
 >**Warning**  
->**This step requires an independent dataset from the one used in the GWAS step**  
+>**This step requires an independent dataset from the one used in the GWAS step -- Please provide it with the flag --indep_pop**  
 >To generate the Principal component analysis to use in this step, please refer to the [PCA module](#pca-module)
 
 >**Warning**  
@@ -588,7 +588,7 @@ On this step the user should also provide all the files (covar, qcovar and pheno
 
 ```bash
 usage: LDPred_PRS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-plink2 PLINK2_PATH] [-bfile PLINK_BINARY_PREFIX] -mlma GWAS_MLMA [--BOLT] [-pheno PHENOTYPE_FILE] [--pheno_col PHENO_COL]
-                     [-qcovar QUANTITATIVE_COVAR] [-n_pcs NUMBER_OF_PCS] [-covar COVAR_FILE] [-o OUTPUT_FOLDER] [--threads THREADS]
+                     [-qcovar QUANTITATIVE_COVAR] [-n_pcs NUMBER_OF_PCS] [-covar COVAR_FILE] [--indep_pop INDEP_POP] [-o OUTPUT_FOLDER] [--threads THREADS]
 
 This is a script to GWAS analysis and plot the results with Manhattam plot
 
@@ -615,6 +615,8 @@ optional arguments:
                         Number of PCs to use on model evaluation -- default = 4
   -covar COVAR_FILE, --covar_file COVAR_FILE
                         Path for the covariables file, e.g. Sex. The same used on the GWAS step
+  --indep_pop INDEP_POP
+                        Independent population, in VCF format, for individual PRS calculation; default is to use the same one provided by -vcf or -bfile
   -o OUTPUT_FOLDER, --output_folder OUTPUT_FOLDER
                         Wanted output folder (default: current output folder)
   --threads THREADS     Number of computer threads -- default = 1
