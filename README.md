@@ -569,8 +569,15 @@ The file *GWAS_summary_adjusted_pvalues.csv* can be passed to [FUMA](https://fum
 ## Polygenic Risk Score - PRS
 
 >**Warning**  
->**This step requires an independent dataset from the one used in the GWAS step -- Please provide it with the flag --indep_pop**  
->To generate the Principal component analysis to use in this step, please refer to the [PCA module](#pca-module)
+>**This step requires an independent dataset from the one used in the GWAS step**  
+>To generate the Principal component analysis to use in this step, please refer to the [PCA module](#pca-module)  
+>Also reamember to check if the rsIDs in your independent dataset are the same as the one from GWAS  
+
+>**Warning**  
+>**Alongside the already independent population provided for PRS it is necessary a third one for validation**  
+>If not provided, GARSA will use the same popualtion for testing and validation causing *over-fitting*  
+>Also reamember to check if the rsIDs in your valdiation dataset are the same as the one from PRS  
+>The user can annotate both datasets using the [update_rsID](#update-rsids-module-update_rsid) moduel  
 
 >**Warning**  
 >This step creates a storage demanding file with extension *.bk*  
@@ -584,7 +591,7 @@ This module was mostly implemented in R using the library ***bigsnpr***
 On this step the user should also provide all the files (covar, qcovar and phenotype) similar to the ones used in the GWAS module. Besides that, the user must provide the column name (header) of the desired phenotype on the phenotype file.  
 
 #### Example usage:
-`python3 GARSA.py PRS -vcf path/to/independent_data.vcf.gz -mlma GCTA_summary_statistics.mlma -pheno phenotype_file.tab -qcovar data_PCA_total.txt -covar covar_file.tab --pheno_col SBP`
+`python3 GARSA.py PRS -vcf path/to/independent_data.vcf.gz -mlma GCTA_summary_statistics.mlma -pheno phenotype_file.tab -qcovar data_PCA_total.txt -covar covar_file.tab --pheno_col SBP --indep_pop path/to/validation_data.vcf.gz`
 
 ```bash
 usage: LDPred_PRS.py [-h] [-vcf VCF_FILE] [-plink PLINK_PATH] [-plink2 PLINK2_PATH] [-bfile PLINK_BINARY_PREFIX] -mlma GWAS_MLMA [--BOLT] [-pheno PHENOTYPE_FILE] [--pheno_col PHENO_COL]
