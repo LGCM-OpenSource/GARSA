@@ -79,6 +79,7 @@ kinship			-- Runs Kinship analysis and correction for admixture populations
 PCA			-- Runs PCA and population analysis
 GWAS			-- Runs GWAS analysis using GCTA or BOLT-LMM software
 PRS 			-- Runs PRS analysis using LDPred2
+extrapol_PRS		-- Runs the extrapolation of PRS data from the PRS module to new cohorts
 download_db		-- Download the database needed for the update_rsID module
 ''')
 )
@@ -173,11 +174,16 @@ if command == "PRS":
 	arguments = ["python3",script_to_run] + args[1:]
 	subprocess.run(arguments)
 
+if command == "extrapol_PRS":
+	script_to_run = os.path.join(script_path, "PRS_extrapolation.py")
+	arguments = ["python3",script_to_run] + args[1:]
+	subprocess.run(arguments)
+
 if command == "download_db":
 	script_to_run = os.path.join(script_path, "download_database.py")
 	subprocess.run(["python3", script_to_run])
 
-c = ["dedup", "update_rsID", "rename_sample_id", "quality_control", "quality_ind", "kinship", "PCA", "GWAS", "PRS", "download_db"]
+c = ["dedup", "update_rsID", "rename_sample_id", "quality_control", "quality_ind", "kinship", "PCA", "GWAS", "PRS", "download_db", "extrapol_PRS"]
 
 if command not in c:
 	print(color_text("Command not found", "red"))
