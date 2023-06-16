@@ -708,7 +708,7 @@ if gcta_run:
 
 	print(color_text("Calculating Chi2 for all variants -- This may take a while", "yellow"))
 
-	gwas_summary["Chi2"] = gwas_summary["1-pvalue"].apply(lambda x: chi2.ppf(x,1))
+	gwas_summary["Chi2"] = gwas_summary["1-pvalue"].apply(lambda x: chi2.isf(x,1) if x == 1 else chi2.ppf(x,1))
 
 	#Agora vamos tirar a mediana dos valore de Chi2
 
@@ -780,7 +780,7 @@ if bolt_run:
 
 	print(color_text("Calculating Chi2 for all variants -- This may take a while", "yellow"))
 
-	gwas_summary["Chi2"] = gwas_summary["1-pvalue"].apply(lambda x: chi2.ppf(x,1))
+	gwas_summary["Chi2"] = gwas_summary["1-pvalue"].apply(lambda x: chi2.isf(x,1) if x == 1 else chi2.ppf(x,1))
 
 	#Agora vamos tirar a mediana dos valore de Chi2
 
