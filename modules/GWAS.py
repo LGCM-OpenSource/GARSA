@@ -301,7 +301,7 @@ if not ind_snps:
 		print(color_text("Path used for Plink1.9 executable = "+str(plink_path), "red"))
 		print(color_text("Error log is stored in "+plink_indep_err, "yellow"))
 		exit(1)
-	ind_snps = plink_indep_out+".out.prune.in"
+	ind_snps = plink_indep_out+".prune.in"
 
 # ## Cheking FID IID in all covar files
 
