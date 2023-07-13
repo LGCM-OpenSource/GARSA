@@ -154,6 +154,8 @@ if vcf_file:
 if bfile:
 	file_path = os.path.abspath(bfile)
 
+	bfile = file_path
+
 	file_name = file_path.split("/")[-1]
 
 	base_name = file_name
@@ -237,8 +239,10 @@ if kinship:
 #tempos de execução
 exec_times = []
 
+print(color_text(f"Using: {bfile}", "green"))
 
-if vcf_file: #Se foi dado amboms VCF e path do plink o programa executa o plink para formar os arquivos binários
+
+if vcf_file: #Se foi dado ambos VCF e path do plink o programa executa o plink para formar os arquivos binários
 
 	plink_convertion_start = time.time()
 

@@ -85,6 +85,7 @@ arg_parser.add_argument("-qcovar", "--quantitative_covar", help = "Path for the 
 arg_parser.add_argument("-n_pcs", "--number_of_pcs", help = "Number of PCs to use on model evaluation -- default = 4", default="4")
 arg_parser.add_argument("-covar", "--covar_file", help = "Path for the covariables file, e.g. Sex. The same used on the GWAS step")
 arg_parser.add_argument("--indep_pop", help = "Independent population, in VCF format, for individual PRS calculation; default is to use the same one provided by -vcf or -bfile")
+arg_parser.add_argument("--indep_pheno", help = "Phenotype of the independent population, in CSV format, with FID IID Pheno as the columns -- default is to use the same provided in -pheno flag")
 arg_parser.add_argument("-o", "--output_folder", help = "Wanted output folder (default: current output folder)")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
 
@@ -132,7 +133,7 @@ n_pcs = args_dict["number_of_pcs"]
 bolt = args_dict["BOLT"]
 pheno_col = args_dict["pheno_col"]
 indep_pop = args_dict["indep_pop"]
-
+indep_pheno = args_dict["indep_pheno"]
 #######################
 ## Pre-flight checks ##
 #######################
@@ -426,7 +427,12 @@ exec_times.append(["PRS", prs_time])
 
 #PLOTS
 
+if indep_pheno:
+	pheno = indep_pheno
+
+
 #O output do PRS sai como output_PRS+".sscore"
+#Usar indep_pheno
 
 print(color_text("Plotting boxplot"))
 
@@ -434,18 +440,18 @@ prs_data = pd.read_csv(output_PRS+".sscore", names=["IID", "PRS"], header=None, 
 
 pheno_data = pd.read_csv(pheno, sep=None, engine="python")
 
-covars = pd.read_csv(covar, sep=None, engine="python")
+# covars = pd.read_csv(covar, sep=None, engine="python")
 
-qcovars = pd.read_csv(qcovar, sep=None, engine="python")
+# qcovars = pd.read_csv(qcovar, sep=None, engine="python")
 
-#1 merge
-pheno_total = pd.merge(pheno_data, covars, on=["FID", "IID"], how="inner")
-#2 merge
-pheno_total = pd.merge(pheno_total, qcovars, on=["FID", "IID"], how="inner")
+# #1 merge
+# pheno_total = pd.merge(pheno_data, covars, on=["FID", "IID"], how="inner")
+# #2 merge
+# pheno_total = pd.merge(pheno_total, qcovars, on=["FID", "IID"], how="inner")
 
 #3 Join PRS scores and phenotype data
 
-prs_pheno = pd.merge(prs_data, pheno_total, on="IID", how="inner")
+prs_pheno = pd.merge(prs_data, pheno_data, on="IID", how="inner")
 
 #Calculating PRS deciles
 
@@ -455,12 +461,12 @@ prs_pheno["Deciles"] = pd.qcut(prs_pheno["PRS"], 10, labels=False)
 prs_deciles_out = os.path.join(out_dir_path, "PRS_deciles_distribution.tsv")
 prs_pheno.to_csv(prs_deciles_out, sep="\t", index=False)
 
-#Plotting boxplot
+#Plotting pointplot
 boxplot_png = os.path.join(out_dir_path, "PRS_boxplot.png")
 boxplot_svg = os.path.join(out_dir_path, "PRS_boxplot.svg")
 
 fig, ax = plt.subplots(figsize=(15,10))
-sns.boxplot(x="Deciles", y=pheno_col, data=prs_pheno, ax=ax, color="lightblue")
+sns.pointplot(x="Deciles", y=pheno_col, data=prs_pheno, ax=ax, color="lightblue")
 sns.despine(fig=None, ax=None, top=True, right=True, left=False, bottom=False, offset=None, trim=False)
 ax.set_xlabel("Deciles", fontsize=16)
 ax.set_ylabel("Phenotype distribution", fontsize=16)
