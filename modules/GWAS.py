@@ -284,7 +284,7 @@ if not ind_snps:
 	plink_indep_out = os.path.join(temp_files, base_name+"_indep")
 
 	plink_indep_err = os.path.join(temp_files, "plink_indep.err")
-	plink_indep_out = os.path.join(temp_files, "plink_indep.out")
+	plink_indep_log = os.path.join(temp_files, "plink_indep.out")
 
 	print(color_text("WARNING: Independent SNPS file not found. Running Plink --indep-pairwise 50 5 0.08", "yellow"))
 	try:
@@ -292,7 +292,7 @@ if not ind_snps:
 			text=True)
 		with open(plink_indep_err, "w") as err:
 			err.write(_try.stderr)
-		with open(plink_indep_out, "w") as out:
+		with open(plink_indep_log, "w") as out:
 			out.write(_try.stdout)
 		if _try.stderr:
 			print(color_text("WARNING: Plink1.9. Check error log file "+plink_indep_err, "yellow"))
@@ -301,7 +301,7 @@ if not ind_snps:
 		print(color_text("Path used for Plink1.9 executable = "+str(plink_path), "red"))
 		print(color_text("Error log is stored in "+plink_indep_err, "yellow"))
 		exit(1)
-ind_snps = plink_indep_out
+	ind_snps = plink_indep_out+".out.prune.in"
 
 # ## Cheking FID IID in all covar files
 
