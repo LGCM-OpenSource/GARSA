@@ -901,7 +901,7 @@ try:
 
 	#QQ output
 
-	qq_output = os.path.join(out_dir_path, "QQ_plot"+base_name+".pdf")
+	qq_output = os.path.join(out_dir_path, "QQ_plot"+base_name+".png")
 
 	plt.savefig(qq_output, dpi=300)
 except:
