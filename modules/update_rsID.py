@@ -112,7 +112,7 @@ hg_build = args_dict["ref_build"]
 output_folder = args_dict["output_folder"]
 bcftools_path = args_dict["bcftools_path"]
 plink2_path = os.path.join(script_path, "plink2")
-plink_path = args_dict["plink2_path"]
+plink_path = args_dict["plink_path"]
 remove_temp = args_dict["rm_temp_files"]
 threads = args_dict["threads"]
 
@@ -275,9 +275,21 @@ ref_vcf_explode = ref_vcf.assign(ALT=ref_vcf["ALT"].str.split(",")).explode("ALT
 
 intersect_data = pd.merge(user_bim, ref_vcf_explode, on=["Chr", "Position"], how="inner")
 
+#REF_x -> users reference allele
+#ALT_x -> users alternative allele
+
+#REF_y -> Reference VCF reference allele
+#ALT_y -> Reference VCF alternative allele
+
 #Checking for swapps
 
-intersect_data["swapped"] = intersect_data.apply(lambda x: "TRUE" if x["REF_x"] == x["ALT_y"] and x["ALT_x"] == x["REF_y"] else "FALSE", axis=1)
+def swap(user_ref, user_alt, ref_ref, ref_alt):
+	if (user_ref == ref_alt) and (user_alt == ref_ref):
+		return "TRUE"
+	else:
+		return "FALSE"
+
+intersect_data["swapped"] = intersect_data.apply(lambda x: swap(x["REF_x"],x["ALT_x"],x["REF_y"],x["ALT_y"]), axis=1)
 
 swapped_count = intersect_data["swapped"].values.tolist().count("TRUE")
 
@@ -294,22 +306,30 @@ if swapped_count != 0:
 	print(color_text(str(swapped_count)+" swapped SNPs found", "yellow"))
 
 	to_swap = intersect_data[intersect_data["swapped"] == "TRUE"]
-	to_swap = to_swap[["ALT_y", "rsID_in"]]
+
+	#STRUCTURE FOR PLINK
+	#1. rsID
+	#2. OLD REFERENCE (user_ref|REF_x)
+	#3. OLD ALTERNATIVE (user_alt|ALT_x)
+	#4. NEW REFERNCE (ref_ref|REF_y)
+	#5. NEW ALTERNATIVE (alt_ref|ALT_y)
+
+	to_swap = to_swap[["rsID_in", "REF_x", "ALT_x", "REF_y", "ALT_y"]]
 	to_swap = to_swap.drop_duplicates(subset="rsID_in")
 	to_swap.to_csv(swap_file, sep="\t", index=False, header=False)
 
 	#Rodar correção pelo plink
 	try:
-		_try = subprocess.run([plink2_path, "--vcf", input_swap, "--keep-allele-order","--id-delim","_","--allow-extra-chr","--alt1-allele", "force", swap_file, "1", "2", "--make-bed", "--out", swapped_out, "--threads", threads],stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+		_try = subprocess.run([plink_path, "--vcf", input_swap, "--keep-allele-order","--id-delim","_","--allow-extra-chr","--update-alleles",swap_file,"--make-bed", "--out", swapped_out, "--threads", threads],stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(swap_err, "w") as err:
 			err.write(_try.stderr)
 		with open(swap_out, "w") as out:
 			out.write(_try.stdout)
 		if _try.stderr:
-			print(color_text("WARNING: Plink2. Check error log file "+swap_err, "red"))
+			print(color_text("WARNING: Plink1. Check error log file "+swap_err, "red"))
 	except:
-		print(color_text("Error on Plink2 execution", "red"))
-		print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+		print(color_text("Error on Plink1 execution", "red"))
+		print(color_text("Path used for Plink2 executable = "+str(plink_path), "red"))
 		print(color_text("Error log is stored in "+swap_err, "yellow"))
 		exit(1)
 
@@ -319,8 +339,19 @@ if swapped_count == 0:
 
 
 #Checking for Flipps
+complement_dict = {"A":"T",
+	 "C": "G",
+	 "G": "C",
+	 "T":"A"}
 
-intersect_data["flipped"] = intersect_data.apply(lambda x: "TRUE" if Seq(str(x["REF_x"]+x["ALT_x"])).complement() == str(x["REF_y"]+x["ALT_y"]) else "FALSE", axis=1)
+def flip(user_ref, user_alt, ref_ref, ref_alt):
+	if (complement_dict[user_ref] == ref_ref) and (complement_dict[user_alt] == ref_alt):
+		return "TRUE"
+	else:
+		return "FALSE"
+
+
+intersect_data["flipped"] = intersect_data.apply(lambda x: flip(x["REF_x"],x["ALT_x"],x["REF_y"],x["ALT_y"]), axis=1)
 
 flipped_count = intersect_data["flipped"].values.tolist().count("TRUE")
 
