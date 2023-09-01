@@ -345,7 +345,7 @@ complement_dict = {"A":"T",
 	 "T":"A"}
 
 def flip(user_ref, user_alt, ref_ref, ref_alt):
-	if len(user_ref) == 1 or len(user_alt) == 1:
+	if len(user_ref) == 1 and len(user_alt) == 1:
 		if (complement_dict[user_ref] == ref_ref) and (complement_dict[user_alt] == ref_alt):
 			return "TRUE"
 		else:
