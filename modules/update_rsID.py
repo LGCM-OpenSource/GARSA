@@ -263,7 +263,7 @@ print(color_text("Looking for swapped and flipped snps", "yellow"))
 
 #get bim file
 
-user_bim = pd.read_csv(temp_user_bim+".bim", sep="\t", header=None, names=["Chr", "rsID_in","Dist_centimorgans_in", "Position", "REF", "ALT"], dtype="str")
+user_bim = pd.read_csv(temp_user_bim+".bim", sep="\t", header=None, names=["Chr", "rsID_in","Dist_centimorgans_in", "Position", "ALT","REF"], dtype="str")
 
 #Get ref vcf
 
