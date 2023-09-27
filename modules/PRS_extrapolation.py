@@ -74,6 +74,7 @@ arg_parser.add_argument("-plink2", "--plink2_path", help = "Path for the Plink2 
 arg_parser.add_argument("-weight", "--LDpred_weights", help = "Path for the weights_LDPRED2.tsv file generated at the PRS step", required=True)
 arg_parser.add_argument("-o", "--output_folder", help = "Wanted output folder (default: current output folder)")
 arg_parser.add_argument("-bfile", "--plink_binary_prefix", help = "Path for the plink binary file, provide only the prefix (no extensions)")
+arg_parser.add_argument("--colsum", help = "Choose only the sum of PRS to be reported", action="store_true")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
 
 #Se nenhum comando foi dado ao script, automaticamente é mostrado o "help"
@@ -113,6 +114,7 @@ plink2_path = os.path.join(script_path, "plink2")
 threads = args_dict["threads"]
 LD_pred_weight = args_dict["LDpred_weights"]
 bfile = args_dict["plink_binary_prefix"]
+colsum = args_dict["colsum"]
 
 #######################
 ## Pre-flight checks ##
@@ -209,19 +211,38 @@ PRS_out = os.path.join(temp_files, f"{base_name}_Extrapolation_score.out")
 
 output_PRS = os.path.join(out_dir_path, f"{base_name}_Extrapolation_scores")
 
-try:
-	_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read", "cols=scoresums", 
-	"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-	with open(PRS_err, "w") as err:
-		err.write(_try.stderr)
-	with open(PRS_out, "w") as out:
-		out.write(_try.stdout)
-	if _try.stderr:
-		print(color_text("WARNING: Plink2. Check error log file "+PRS_err, "yellow"))
+if colsum:
 
-except:
-	print(color_text("Error on Plink2 execution", "red"))
-	print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
-	print(color_text("Error log is stored in "+PRS_err, "yellow"))
-	exit(1)
+	try:
+		_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read", "cols=scoresums", 
+		"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+		with open(PRS_err, "w") as err:
+			err.write(_try.stderr)
+		with open(PRS_out, "w") as out:
+			out.write(_try.stdout)
+		if _try.stderr:
+			print(color_text("WARNING: Plink2. Check error log file "+PRS_err, "yellow"))
+
+	except:
+		print(color_text("Error on Plink2 execution", "red"))
+		print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+		print(color_text("Error log is stored in "+PRS_err, "yellow"))
+		exit(1)
+
+if not colsum:
+	try:
+		_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read",
+						"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+		with open(PRS_err, "w") as err:
+			err.write(_try.stderr)
+		with open(PRS_out, "w") as out:
+			out.write(_try.stdout)
+		if _try.stderr:
+			print(color_text("WARNING: Plink2. Check error log file "+PRS_err, "yellow"))
+
+	except:
+		print(color_text("Error on Plink2 execution", "red"))
+		print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+		print(color_text("Error log is stored in "+PRS_err, "yellow"))
+		exit(1)
 
