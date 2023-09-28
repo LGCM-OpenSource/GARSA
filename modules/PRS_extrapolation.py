@@ -178,7 +178,7 @@ if vcf_file:
 
     in_bfile = os.path.join(temp_files, "extrapolation_pop")
 
-    subprocess.run([plink2_path, "--vcf", file_path, "--max-alleles", "2", "--make-bed", "--out", in_bfile, "--threads", threads])
+    subprocess.run([plink2_path, "--vcf", file_path, "--max-alleles", "2", "--rm-dup","exclude-all","--make-bed", "--out", in_bfile, "--threads", threads])
 
 if bfile:
 	in_bfile = bfile
