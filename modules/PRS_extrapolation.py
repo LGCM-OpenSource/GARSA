@@ -178,7 +178,7 @@ if vcf_file:
 
     in_bfile = os.path.join(temp_files, "extrapolation_pop")
 
-    subprocess.run([plink2_path, "--vcf", file_path, "--max-alleles", "2", "--rm-dup","exclude-all","--make-bed", "--out", in_bfile, "--threads", threads])
+    subprocess.run([plink2_path, "--vcf", file_path, "--allow-extra-chr","--max-alleles", "2", "--rm-dup","exclude-all","--make-bed", "--out", in_bfile, "--threads", threads])
 
 if bfile:
 	in_bfile = bfile
@@ -191,7 +191,7 @@ freq_out_plink = os.path.join(temp_files, "extrapolation_pop_frequencies") #+.af
 freq_err = os.path.join(temp_files, f"{base_name}_extrapolation_pop_freq.err")
 freq_out = os.path.join(temp_files, f"{base_name}_extrapolation_pop_freq.out")
 
-_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", freq_out_plink, "--freq", "--threads", threads], 
+_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--allow-extra-chr","--out", freq_out_plink, "--freq", "--threads", threads], 
 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 with open(freq_err, "w") as err:
@@ -214,7 +214,7 @@ output_PRS = os.path.join(out_dir_path, f"{base_name}_Extrapolation_scores")
 if colsum:
 
 	try:
-		_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read", "cols=scoresums", 
+		_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--allow-extra-chr","--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read", "cols=scoresums", 
 		"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(PRS_err, "w") as err:
 			err.write(_try.stderr)
@@ -231,7 +231,7 @@ if colsum:
 
 if not colsum:
 	try:
-		_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read",
+		_try = subprocess.run([plink2_path, "--bfile", in_bfile, "--allow-extra-chr","--out", output_PRS, "--score", LD_pred_weight, "1", "2", "3", "header-read",
 						"--threads", threads, "--read-freq", freq_out_plink+".afreq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(PRS_err, "w") as err:
 			err.write(_try.stderr)
