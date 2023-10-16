@@ -658,7 +658,7 @@ This allows the user to fruther validade their PRS predictive power.
 
 #### Example usage
 
-`python3 GARSA.py -vcf path/to/new_cohort.vcf.gz -weight weights_LDPred2.tsv --threads 4`  
+`python3 GARSA.py extrapol_PRS -vcf path/to/new_cohort.vcf.gz -weight weights_LDPred2.tsv --threads 4`  
 
 ```bash
 usage: PRS_extrapolation.py [-h] [-vcf VCF_FILE] [-plink2 PLINK2_PATH] -weight LDPRED_WEIGHTS [-o OUTPUT_FOLDER] [-bfile PLINK_BINARY_PREFIX] [--threads THREADS]
