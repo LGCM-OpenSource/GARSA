@@ -370,10 +370,13 @@ for file in os.listdir(out_put_LDpred):
 print(color_text("Starting PRS calculation from the LDpred2 weights"))
 
 if indep_pop:
+	if indep_pop.endswith(".vcf.gz"):
 	# indep_bfile = os.path.join(temp_files, "independent_pop")
-	in_bfile = os.path.join(temp_files, "independent_pop")
-
-	subprocess.run([plink2_path, "--vcf", indep_pop, "--max-alleles", "2", "--make-bed", "--out", in_bfile, "--threads", threads])
+		in_bfile = os.path.join(temp_files, "independent_pop")
+		subprocess.run([plink2_path, "--vcf", indep_pop, "--max-alleles", "2", "--make-bed", "--out", in_bfile, "--threads", threads])
+	else:
+		print(color_text("Not in VCF format, checking for plink format"), "yellow")
+		in_bfile = indep_pop
 else:	
 	in_bfile = plink_out
 
