@@ -320,7 +320,7 @@ if swapped_count != 0:
 
 	#Rodar correção pelo plink
 	try:
-		_try = subprocess.run([plink_path, "--vcf", input_swap, "--keep-allele-order","--id-delim","_","--allow-extra-chr","--update-alleles",swap_file,"--make-bed", "--out", swapped_out, "--threads", threads],stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+		_try = subprocess.run([plink_path, "--vcf", input_swap, "--keep-allele-order","--id-delim","_","--allow-extra-chr","--update-alleles",swap_file,"--recode", "vcf","bgz", "--out", swapped_out, "--threads", threads],stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(swap_err, "w") as err:
 			err.write(_try.stderr)
 		with open(swap_out, "w") as out:
@@ -376,7 +376,7 @@ if flipped_count != 0:
 	#Corrgir usando plink
 
 	try:
-		_try = subprocess.run([plink_path, "--bfile", swapped_out, "--flip", flip_file, "--allow-extra-chr","--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
+		_try = subprocess.run([plink_path, "--vcf", swapped_out, "--flip", flip_file, "--allow-extra-chr","--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
 			stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(flip_err, "w") as err:
 			err.write(_try.stderr)
@@ -392,25 +392,27 @@ if flipped_count != 0:
 
 
 else:
-	flipped_out = os.path.join(temp_files, base_name+"_flipped")
+	# flipped_out = os.path.join(temp_files, base_name+"_flipped")
+	flipped_out = vcf_file.replace(".vcf.gz","")
 
 	flip_err = os.path.join(temp_files, "flipped_snps.err")
 	flip_out = os.path.join(temp_files, "flipped_snps.out")
 	print(color_text("No flipped SNPs found, skipping correction"))
-	try:
-		_try = subprocess.run([plink2_path, "--bfile", swapped_out,"--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
-			stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-		with open(flip_err, "w") as err:
-			err.write(_try.stderr)
-		with open(flip_out, "w") as out:
-			out.write(_try.stdout)
-		if _try.stderr:
-			print(color_text("WARNING: Plink2. Check error log file "+flip_err, "red"))
-	except:
-		print(color_text("Error on Plink2 execution", "red"))
-		print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
-		print(color_text("Error log is stored in "+flip_err, "yellow"))
-		exit(1)
+
+	# try:
+	# 	_try = subprocess.run([plink2_path, "--bfile", swapped_out,"--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
+	# 		stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+	# 	with open(flip_err, "w") as err:
+	# 		err.write(_try.stderr)
+	# 	with open(flip_out, "w") as out:
+	# 		out.write(_try.stdout)
+	# 	if _try.stderr:
+	# 		print(color_text("WARNING: Plink2. Check error log file "+flip_err, "red"))
+	# except:
+	# 	print(color_text("Error on Plink2 execution", "red"))
+	# 	print(color_text("Path used for Plink2 executable = "+str(plink2_path), "red"))
+	# 	print(color_text("Error log is stored in "+flip_err, "yellow"))
+	# 	exit(1)
 
 print(color_text("Flip and swap corretion done"))
 
