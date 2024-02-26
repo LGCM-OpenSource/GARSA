@@ -554,7 +554,7 @@ input_for_admixture = clean_bfile+".bed"
 list_results = []
 
 try:
-    for i in range(2,int(k_pop)+1):
+    for i in range(2,int(k_pop)):
         print(color_text("Running analysis with K populations = "+str(i), "yellow"))
         admix_run = subprocess.run([admixture_path,"-j"+str(threads), "--cv", input_for_admixture, str(i)], capture_output=True)
         admix_output = admix_run.stdout.decode()
