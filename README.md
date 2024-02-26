@@ -413,8 +413,8 @@ The flag *--garsa_path* should be ignored. It is a workaround some limitations o
 `python3 GARSA.py PCA -vcf path/to/data.vcf.gz -realted Related_at_degree2.txt`
 
 ```bash
-usage: PCA_analysis.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] -related RELATED_FILE [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP] [--prune_r2 PRUNE_R2]
-                       [--threads THREADS] [--garsa_path GARSA_PATH]
+usage: PCA_analysis.py [-h] -vcf VCF_FILE [-plink PLINK_PATH] [-o OUTPUT_FOLDER] -related RELATED_FILE [--window_size WINDOW_SIZE] [--sliding_window_step SLIDING_WINDOW_STEP]
+                       [--prune_r2 PRUNE_R2] [--Hg HG] [--admixture_K ADMIXTURE_K] [--threads THREADS]
 
 This script runs PCA for non-related individualas and projects to related individuals
 
@@ -433,10 +433,15 @@ optional arguments:
   --sliding_window_step SLIDING_WINDOW_STEP
                         Sliding Window step -- default = 50
   --prune_r2 PRUNE_R2   R2 value for prunning-- default = 0.03
+  --Hg HG               Hg version for use -- 38 or 37. Default=37
+  --admixture_K ADMIXTURE_K
+                        Max number of population for admixture análise; Default=10
   --threads THREADS     Number of computer threads -- default = 1
-  --garsa_path GARSA_PATH
-                        Path to main script GARSA -- always provided by default
+
+Ex. usage: script.py
 ```
+
+For default, the max K for the admixture analysis is 10. To change this behavior use **--admixture_K**.  
 
 For this step there are 4 main outputs:
 1. table_for_plot.tsv --> Table with PC information, predicted population and Sample ID for all samples

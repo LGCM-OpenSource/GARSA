@@ -72,6 +72,7 @@ arg_parser.add_argument("--window_size", help = "Window size for prunning step -
 arg_parser.add_argument("--sliding_window_step", help = "Sliding Window step -- default = 50", default="50")
 arg_parser.add_argument("--prune_r2", help = "R2 value for prunning-- default = 0.03", default="0.03")
 arg_parser.add_argument("--Hg", help = "Hg version for use -- 38 or 37. Default=37", default="37")
+arg_parser.add_argument("--admixture_K", help = "Max number of population for admixture análise; Default=10", default="10")
 # arg_parser.add_argument("--N_pop", help = "Number of expected populations in sample, if provided no testing for best K is performed -- The default is for automatic look up using admixture")
 arg_parser.add_argument("--threads", help = "Number of computer threads -- default = 1", default="1")
 # arg_parser.add_argument("--garsa_path", help = "Path to main script GARSA -- always provided by default")
@@ -120,6 +121,7 @@ prune_r2 = args_dict["prune_r2"]
 threads = args_dict["threads"]
 output_folder = args_dict["output_folder"]
 hg = args_dict["Hg"]
+k_pop = args_dict["admixture_K"]
 # GARSA_path = args_dict["garsa_path"]
 GARSA_path = os.getcwd()
 # N_pop = args_dict["N_pop"]
@@ -552,7 +554,7 @@ input_for_admixture = clean_bfile+".bed"
 list_results = []
 
 try:
-    for i in range(2,11):
+    for i in range(2,k_pop+1):
         print(color_text("Running analysis with K populations = "+str(i), "yellow"))
         admix_run = subprocess.run([admixture_path,"-j"+str(threads), "--cv", input_for_admixture, str(i)], capture_output=True)
         admix_output = admix_run.stdout.decode()
