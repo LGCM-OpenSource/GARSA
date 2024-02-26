@@ -52,5 +52,5 @@ if not os.path.exists(hg38_folder):
 		print("hg38 VCF file not found, starting download")
 		subprocess.run(["wget", "-O", hg38_vcf, "https://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/00-All.vcf.gz"])
 		print("Downloading index file")
-		subprocess.run(["wget", "-O", hg38_vcf, "https://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/00-All.vcf.gz.tbi"])
+		subprocess.run(["wget", "-O", hg38_tbi, "https://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/00-All.vcf.gz.tbi"])
 
