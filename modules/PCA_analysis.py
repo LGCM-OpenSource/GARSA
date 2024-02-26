@@ -171,15 +171,15 @@ except:
 
 #Window size
 
-print(color_text("Using window size of"+str(win_size)))
+print(color_text("Using window size of "+str(win_size)))
 
 #Sliding window step
 
-print(color_text("Using step size of"+str(step_size)))
+print(color_text("Using step size of "+str(step_size)))
 
 # R2 threshold
 
-print(color_text("Using R2 threshold of"+str(prune_r2)))
+print(color_text("Using R2 threshold of "+str(prune_r2)))
 
 #Threads 
 print(color_text("Using "+threads+" threads"))

@@ -459,7 +459,7 @@ Those files must be formated as shown below, and can be used in both GCTA and BO
 
 We recommend the use of GCTA for populations with sample size lower than 5000 individuals and BOLT-LMM for populations with sample size higher than 5000 individuals  
 
-The flag *--bh_correction* uses Benjamini-Hochberg p-value correction for multiple tests, even if some work uses this FDR correction it may overcorrect the p-values. So we recommend *NOT* using this falg, and by default GARSA will perform p-value correction using ***Genomic Inflation***.  
+The flag *--bh_correction* uses Benjamini-Hochberg p-value correction for multiple tests, even if some work uses this FDR correction it may overcorrect the p-values. So we recommend *NOT* using this flag, and by default GARSA will perform p-value correction using ***Genomic Inflation***.  
 
 For the BOLT-LMM run, GARSA will generate a list of *Independent SNPS* using LD-Prunning from the plink1.9 tool with the following parameters `--indep-pairwise 50 5 0.08`  
 
@@ -492,7 +492,7 @@ In this example only "sex" is used as qualitative covariable. Important: For thi
 
 
 qcovar file (quantitative covariable):
-On this file, we use the PCs generated above, file *<file_name>_PCA_total.txt*. This file is already correctly foramted.  
+On this file, we use the PCs generated above, file *<file_name>_PCA_total.txt*. This file is already correctly formated.  
 If the user wishes, more quantitative covariables can be added to this file.  
 
 | FID | IID | PC1 | PC2 | PC3 | 
