@@ -335,7 +335,9 @@ if swapped_count != 0:
 
 if swapped_count == 0:
 	print(color_text("No swapped SNPs found, skipping correction"))
-	swapped_out = vcf_file
+	swapped_out = file_path
+	
+# swapped_out = swapped_out + ".vcf.gz"
 
 
 #Checking for Flipps
@@ -364,7 +366,7 @@ if flipped_count != 0:
 
 	# Criar arquivo com os SNPs para flip
 	flip_file = os.path.join(temp_files, "flip_allele.txt")
-	flipped_out = os.path.join(temp_files, base_name+"_flipped")
+	flipped_out = os.path.join(temp_files, base_name + "_flipped")
 
 	flip_err = os.path.join(temp_files, "flipped_snps.err")
 	flip_out = os.path.join(temp_files, "flipped_snps.out")
@@ -376,7 +378,7 @@ if flipped_count != 0:
 	#Corrgir usando plink
 
 	try:
-		_try = subprocess.run([plink_path, "--vcf", f"{swapped_out}.vcf.gz", "--flip", flip_file, "--allow-extra-chr","--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
+		_try = subprocess.run([plink_path, "--vcf", swapped_out, "--flip", flip_file, "--allow-extra-chr", "--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
 			stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(flip_err, "w") as err:
 			err.write(_try.stderr)
@@ -393,7 +395,8 @@ if flipped_count != 0:
 
 else:
 	# flipped_out = os.path.join(temp_files, base_name+"_flipped")
-	flipped_out = vcf_file.replace(".vcf.gz","")
+	flipped_out = swapped_out.replace(".vcf.gz","_flipped.vcf.gz")
+	# flipped_out = flipped_out + ".vcf.gz"
 
 	flip_err = os.path.join(temp_files, "flipped_snps.err")
 	flip_out = os.path.join(temp_files, "flipped_snps.out")
