@@ -472,6 +472,9 @@ if len(duplicated_list) > 0:
 	print(color_text(f"Found {len(duplicated_list)} duplicated rsIDs. Removing ...", "yellow"))
 	subprocess.run([f"zgrep -v -E '{'|'.join(duplicated_list)}' {annot_output} > {final_annot_output}"], shell=True)
 
+if len(duplicated_list) <= 0:
+	os.rename(annot_output, final_annot_output)
+
 print(color_text("Indexing compressed file"))
 subprocess.run([bcftools_path,"index","-f","--threads",threads,"-t",annot_output])
 

@@ -2,4 +2,7 @@ memory_log/
 modules/database/dbsnp_hg38p7_b151
 modules/database/dbsnp_hg37p13_b151
 modules/teste
-
+*.hdf5
+*hm3
+modules/apply_PCA_BETA_correction.py
+modules/PRS_csx_module.py
