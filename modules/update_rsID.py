@@ -378,7 +378,7 @@ if flipped_count != 0:
 	#Corrgir usando plink
 
 	try:
-		_try = subprocess.run([plink_path, "--vcf", swapped_out, "--flip", flip_file, "--allow-extra-chr", "--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
+		_try = subprocess.run([plink_path, "--vcf", f"{swapped_out}.vcf.gz", "--flip", flip_file, "--allow-extra-chr", "--recode", "vcf", "bgz", "--out", flipped_out,"--threads", threads],
 			stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 		with open(flip_err, "w") as err:
 			err.write(_try.stderr)
