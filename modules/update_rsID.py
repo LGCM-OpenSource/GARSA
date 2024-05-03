@@ -470,7 +470,11 @@ duplicated_list = annotated_vcf[annotated_vcf[2].duplicated() == True][2].values
 print(color_text("Looking for possible duplicated rsIDs after annotation"))
 if len(duplicated_list) > 0:
 	print(color_text(f"Found {len(duplicated_list)} duplicated rsIDs. Removing ...", "yellow"))
-	subprocess.run([f"zgrep -v -E '{'|'.join(duplicated_list)}' {annot_output} > {final_annot_output}"], shell=True)
+	tmp_output_zgrep = final_annot_output.replace(".gz", "")
+	#Aqui eu removo o ".gz." da variavel "final_annot_output" para que seja colocado novamente pela etapa de gzip seguinte. 
+	#Isso não altera o valor das variaveis abaixo pq o arquivo ainda estara na mesma localização e com o mesmo nome.
+	subprocess.run([f"zgrep -v -E '{'|'.join(duplicated_list)}' {annot_output} > {tmp_output_zgrep}"], shell=True)
+	subprocess.run([f"gzip {tmp_output_zgrep}"])
 
 if len(duplicated_list) <= 0:
 	os.rename(annot_output, final_annot_output)
