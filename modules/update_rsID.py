@@ -474,6 +474,7 @@ if len(duplicated_list) > 0:
 
 if len(duplicated_list) <= 0:
 	os.rename(annot_output, final_annot_output)
+	annot_output = final_annot_output
 
 print(color_text("Indexing compressed file"))
 subprocess.run([bcftools_path,"index","-f","--threads",threads,"-t",annot_output])
