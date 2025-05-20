@@ -226,8 +226,17 @@ if len(unique_SNPs) < total_snps:
 	rm_dup_start = time.time()
 
 	try:
-		_try = subprocess.run([plink2_path, "--vcf", vcf_file,"--allow-extra-chr","--recode", "vcf", "bgz", "--extract", snp_list_output, "--max-alleles","2","--out", max_alleles_out_file,
-			"--threads", threads], stdout=subprocess.PIPE,stderr=subprocess.PIPE, text=True)
+		_try = subprocess.run([
+        plink2_path, "--vcf", vcf_file,
+        "--allow-extra-chr",
+        "--recode", "vcf", "bgz",
+        "--extract", snp_list_output,
+        "--max-alleles", "2",
+        "--snps-only",
+        "--out", max_alleles_out_file,
+        "--threads", str(threads)
+		], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
 		with open (dup_multiallele_err, "w") as err:
 			err.write(_try.stderr)
 		with open (dup_multiallele_out, "w") as out:
@@ -268,8 +277,16 @@ if len(unique_SNPs) == total_snps:
 	multiallele_remove_out = os.path.join(temp_files, "multiallelic_remove.out")
 
 	try:
-		_try = subprocess.run([plink2_path, "--vcf", vcf_file,"--allow-extra-chr","--recode", "vcf", "bgz", "--max-alleles","2","--out", max_alleles_out_file,
-			"--threads", threads],stdout=subprocess.PIPE,stderr=subprocess.PIPE,  text=True)
+		_try = subprocess.run([
+            plink2_path, "--vcf", vcf_file,
+            "--allow-extra-chr",
+            "--recode", "vcf", "bgz",
+            "--max-alleles", "2",
+            "--snps-only",
+            "--out", max_alleles_out_file,
+            "--threads", str(threads)
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
 		with open(multiallele_remove_err, "w") as err:
 			err.write(_try.stderr)
 		with open(multiallele_remove_out, "w") as out:
