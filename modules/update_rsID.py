@@ -474,7 +474,8 @@ if len(duplicated_list) > 0:
 	#Aqui eu removo o ".gz." da variavel "final_annot_output" para que seja colocado novamente pela etapa de gzip seguinte. 
 	#Isso não altera o valor das variaveis abaixo pq o arquivo ainda estara na mesma localização e com o mesmo nome.
 	subprocess.run([f"zgrep -v -E '{'|'.join(duplicated_list)}' {annot_output} > {tmp_output_zgrep}"], shell=True)
-	subprocess.run([f"gzip {tmp_output_zgrep}"], shell=True)
+	subprocess.run([f"bgzip -f {tmp_output_zgrep}"], shell=True)
+	annot_output = tmp_output_zgrep + ".gz"
 
 if len(duplicated_list) <= 0:
 	os.rename(annot_output, final_annot_output)
