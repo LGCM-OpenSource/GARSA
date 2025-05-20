@@ -23,6 +23,10 @@ from assocplots.qqplot import * #0.0.2
 import statsmodels
 import warnings
 import re
+from assocplots.qqplot import *
+from assocplots.manhattan import *
+from scipy.stats import beta
+from matplotlib.colors import hex2color
 
 ###############
 ## Functions ##
@@ -849,63 +853,104 @@ if gcta_run:
 if bolt_run:
 	gwas_adjusted_group = gwas_adjusted.groupby(("CHR"))
 ##PLOTING##
-print(color_text("Plotting Manhatam Plot"))
-#Para isso vamos precisar de algumas bibliotecas extras
+print(color_text("Plotting Manhattan Plot"))
 
-fig = plt.figure(figsize=(20, 8)) # Set the figure size
-ax = fig.add_subplot(111)
+warnings.filterwarnings("ignore")
 
-colors = ['cornflowerblue','lightskyblue']
-x_labels = []
-x_labels_pos = []
-
-
-for num, (name, group) in enumerate(gwas_adjusted_group):
-	group.plot(kind='scatter', x='ind', y='-log10_pvalue',color=colors[num % len(colors)], ax=ax)
-	x_labels.append(name)
-	x_labels_pos.append((group['ind'].iloc[-1] - (group['ind'].iloc[-1] - group['ind'].iloc[0])/2))
-ax.set_xticks(x_labels_pos)
-ax.set_xticklabels(x_labels, fontsize=12)
-
-# x axis label
-ax.set_xlabel('Chromosome')
-
-#Linha threshold
-plt.axhline(y = -np.log10(5e-8), color = 'b', linestyle = '--')
-plt.axhline(y = -np.log10(5e-6), color = 'g', linestyle = '--')
-
-#Save to Output
-
-plot_manhattam_out = os.path.join(out_dir_path, "Manhattam_plot_"+base_name+".png")
-
-plt.savefig(plot_manhattam_out, dpi=300)
-
-
-#QQ plot
-
-# gwas_adjusted = gwas_adjusted[gwas_adjusted["Corrected_pvalues"] != 0]
-print(color_text("Plotting QQ Plot"))
+fig = plt.figure(figsize=(20, 8))
+plt.rcParams.update({'font.size': 18})
 
 try:
-	with warnings.catch_warning():
-		warnings.simplefilter("ignore")
-	fig = plt.figure(figsize=(10,10))
-	qqplot([gwas_adjusted["Corrected_pvalues"]],
-		["p-values"],
-		color=['b'], 
-		fill_dens=[0.2], 
-		error_type='theoretical', 
-		distribution='beta',
-		title='')
-	plt.legend(fontsize=20)
+    manhattan(gwas_adjusted["Corrected_pvalues"],
+			  gwas_adjusted["BP"],
+			  gwas_adjusted["CHR"].astype(str),
+			  None,
+			  plot_type='single',
+			  chrs_plot=[str(i) for i in range(1, 23)],
+			  chrs_names=np.array([str(i) for i in range(1, 23)]),
+			  cut=0,
+			  top1=0,
+			   title='Manhattan Plot\n',
+			   colors=['cornflowerblue', 'lightskyblue'],
+			   xlabel='Chromosome',
+			   ylabel='-log10(p-value)',
+			   lines=[-np.log10(5e-6), -np.log10(5e-8)],
+			   lines_colors=['green', 'blue'],
+			   lines_styles=['--', '--'],
+			   lines_widths=[1, 1]
+			   )
+    
+    ax = plt.gca()
+    ax.tick_params(axis='x', labelsize=15)
+    ax.tick_params(axis='y', labelsize=15)
 
-	#QQ output
+    plot_manhattan_out = os.path.join(out_dir_path, "Manhattam_plot_"+base_name+".png")
+    plt.savefig(plot_manhattan_out, dpi=300)
+    print(color_text(f"Plot saved successfully at: {plot_manhattan_out}"))
 
-	qq_output = os.path.join(out_dir_path, "QQ_plot"+base_name+".png")
+except Exception as e:
+    error_message = f"Manhattan plot failed: {str(e)}"
+    print(color_text(error_message, color='red'))
 
-	plt.savefig(qq_output, dpi=300)
-except:
-	print(color_text("WARNING: QQ plot, with the GWAS_summary_adjusted_pvalues.csv the plot can be manualy plotted if not found in output folder", "yellow"))
+    # Salvar erro no arquivo .err
+    error_log_path = os.path.join(out_dir_path, "Manhattam_plot.err")
+    with open(error_log_path, "w") as err_file:
+        err_file.write(error_message + "\n")
+    print(color_text(f"Error details saved to: {error_log_path}"))
+
+print(color_text("Plotting QQ Plot"))
+
+warnings.filterwarnings("ignore")
+
+fig = plt.figure(figsize=(10, 10))
+plt.rcParams.update({'font.size': 18})
+
+try:
+    pvals = gwas_adjusted["Corrected_pvalues"].dropna()
+    pvals_sorted = np.sort(pvals)
+    n = len(pvals_sorted)
+
+    # Esperado sob H0
+    expected = np.arange(1, n + 1) / (n + 1)
+    observed = -np.log10(pvals_sorted)
+    expected_log = -np.log10(expected)
+
+    # Intervalo de confiança (95%)
+    ci = 0.95
+    lower_ci = -np.log10(beta.ppf((1 - ci) / 2, np.arange(1, n + 1), np.arange(n, 0, -1)))
+    upper_ci = -np.log10(beta.ppf((1 + ci) / 2, np.arange(1, n + 1), np.arange(n, 0, -1)))
+
+    # Faixa de confiança
+    plt.fill_between(expected_log, lower_ci, upper_ci, color='#1c1ce6', alpha=0.4, label='95% CI')
+
+    # Linha esperada
+    plt.plot(expected_log, expected_log, linestyle='--', color='black', label='Expected')
+
+    # Observado
+    plt.scatter(expected_log, observed, color='#1c1ce6', s=10, label='Observed')
+
+    plt.xlabel('Expected -log10(p)')
+    plt.ylabel('Observed -log10(p)')
+    plt.title('QQ Plot\n')
+    plt.legend()
+
+    ax = plt.gca()
+    ax.tick_params(axis='x', labelsize=15)
+    ax.tick_params(axis='y', labelsize=15)
+
+    qq_output = os.path.join(out_dir_path, "QQ_Plot_"+base_name+".png")
+    plt.savefig(qq_output, dpi=300)
+    print(color_text(f"QQ plot saved successfully at: {qq_output}"))
+
+except Exception as e:
+    error_message = f"QQ plot failed: {str(e)}"
+    print(color_text(error_message, color='red'))
+
+    # Salvar erro no arquivo .err
+    error_log_path = os.path.join(out_dir_path, "Manhattam_plot.err")
+    with open(error_log_path, "w") as err_file:
+        err_file.write(error_message + "\n")
+    print(color_text(f"Error details saved to: {error_log_path}"))
 
 plot_end = time.time()
 
