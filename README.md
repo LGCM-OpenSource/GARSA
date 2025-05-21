@@ -24,7 +24,7 @@ Rossi, F. P. N., Patané, J. S. L., de Souza, V., Neyra, J. M., Rosa, R. S., Kri
 [PCA module](#pca-module) \
 [GWAS module](#gwas-module) \
 [PRS - through LDPred2](#polygenic-risk-score-prs---through-ldpred2) \
-[🚧 PRS - through PRS-CSx](#-polygenic-risk-score-prs---through-prs-csx) \
+[🚧 PRS - through PRS-CSx](#-polygenic-risk-score-prs---through-prs-cs) \
 [Extrapolation to different cohorts](#extrapolation-to-different-cohorts) \
 [Resources](#resources-used-for-a-population-with-n49-samples-with-around-one-milion-variants)
 
