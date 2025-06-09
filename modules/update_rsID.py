@@ -397,7 +397,7 @@ else:
 	# flipped_out = os.path.join(temp_files, base_name+"_flipped")
 	# flipped_out = swapped_out.replace(".vcf.gz","_flipped.vcf.gz")
 	# flipped_out = flipped_out + ".vcf.gz"
-	flipped_out = swapped_out
+	flipped_out = swapped_out.replace(".vcf.gz","")
 
 	# flip_err = os.path.join(temp_files, "flipped_snps.err")
 	# flip_out = os.path.join(temp_files, "flipped_snps.out")
